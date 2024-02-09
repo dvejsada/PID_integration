@@ -16,7 +16,7 @@ class DepartureBoard:
         self._id = stop_id
         self.conn_num = conn_num
         self.departures = []
-        self._name = response["stops"][0]["stop_name"]
+        self._name = response["stops"][0]["stop_name"] + " " + response["stops"][0]["platform_code"]
         self.extra_attr = response["departures"]
         for i in range(self.conn_num):
             self.departures.append(i)
