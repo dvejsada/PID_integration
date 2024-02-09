@@ -40,6 +40,7 @@ class DepartureSensor(SensorEntity):
         self._attr_name = f"Departure_{self._departure+1}"
         self._state = self._departure_board.extra_attr[self._departure]["route"]["short_name"]
         self._extra_attr = self._departure_board.extra_attr[self._departure]
+        self._route_type = self._departure_board.extra_attr[self._departure]["route"]["type"]
 
     @property
     def device_info(self):
@@ -61,11 +62,11 @@ class DepartureSensor(SensorEntity):
 
     @property
     def icon(self):
-        if self._departure_board.extra_attr[self._departure]["route"]["type"] == 1:
+        if int(self._route_type) == 0:
             icon = ICON_TRAM
-        elif self._departure_board.extra_attr[self._departure]["route"]["type"] == 0:
+        elif int(self._route_type) == 1:
             icon = ICON_METRO
-        elif self._departure_board.extra_attr[self._departure]["route"]["type"] == 2:
+        elif int(self._route_type) == 2:
             icon = ICON_TRAIN
         else:
             icon = ICON_BUS
