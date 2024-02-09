@@ -9,7 +9,7 @@ class ApiCall:
     @staticmethod
     def update_info(api_key, stop_id, conn_num):
         headers = {"Content-Type": "application/json; charset=utf-8", "x-access-token": api_key}
-        parameters = {"ids": stop_id, "total": conn_num}
+        parameters = {"ids": stop_id, "total": conn_num, "minutesAfter": 720}
 
         response = requests.get(API_URL, params=parameters, headers=headers)
         return response.json()
@@ -17,7 +17,7 @@ class ApiCall:
     @staticmethod
     def authenticate(api_key, stop_id, conn_num):
         headers = {"Content-Type": "application/json; charset=utf-8", "x-access-token": api_key}
-        parameters = {"ids": stop_id, "total": conn_num}
+        parameters = {"ids": stop_id, "total": conn_num, "minutesAfter": 720}
         response = requests.get(API_URL, params=parameters, headers=headers)
         reply = response.json()
         title = reply["stops"][0]["stop_name"]
