@@ -9,7 +9,7 @@ from homeassistant.components.sensor import (
 
 from datetime import timedelta
 
-from .const import ICON, DOMAIN
+from .const import ICON_BUS, ICON_TRAM, ICON_METRO,ICON_TRAIN, DOMAIN
 
 
 SCAN_INTERVAL = timedelta(seconds=30)
@@ -61,7 +61,15 @@ class DepartureSensor(SensorEntity):
 
     @property
     def icon(self):
-        return ICON
+        if self._departure_board.extra_attr[self._departure]["route"]["type"] == 1:
+            icon = ICON_TRAM
+        elif self._departure_board.extra_attr[self._departure]["route"]["type"] == 0:
+            icon = ICON_METRO
+        elif self._departure_board.extra_attr[self._departure]["route"]["type"] == 2:
+            icon = ICON_TRAIN
+        else:
+            icon = ICON_BUS
+        return icon
 
     @property
     def name(self):
