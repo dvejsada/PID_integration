@@ -6,36 +6,69 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from .api_call import call_api
+
+from datetime import timedelta
+
+from .const import ICON, DOMAIN
 
 
-def setup_platform(
-    hass: HomeAssistant,
-    config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None
-) -> None:
-    """Set up the sensor platform."""
-    add_entities([BusSensor()])
+SCAN_INTERVAL = timedelta(seconds=30)
 
 
-class BusSensor(SensorEntity):
-    """Representation of a Sensor."""
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Add sensors for passed config_entry in HA."""
+    departure_board = hass.data[DOMAIN][config_entry.entry_id]
+    new_entities = []
+    for i in departure_board.departures:
+        new_entities.append(DepartureSensor(departure_board.departures[i], departure_board))
 
-    def __init__(self):
-        self._attr_name = "Bus z Malešického parku"
-        self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
-        self._attr_device_class = SensorDeviceClass.TEMPERATURE
-        self._attr_state_class = SensorStateClass.MEASUREMENT
+    # Add all entities to HA
 
-    def update(self) -> None:
-        """Fetch new state data for the sensor.
+    async_add_entities(new_entities)
 
-        This is the only method that should fetch new data for Home Assistant.
-        """
-        time_to_next_bus = call_api()
-        self._attr_native_value = time_to_next_bus
+
+class DepartureSensor(SensorEntity):
+    """Sensor for departure."""
+
+    def __init__(self, departure: int, departure_board):
+
+        self._departure = departure
+        self._departure_board = departure_board
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+
+        # The name of the entity
+        self._attr_name = f"Departure_{self._departure+1}"
+        self._state = self._departure_board.extra_attr[self._departure]["route"]["short_name"]
+        self._extra_attr = self._departure_board.extra_attr[self._departure]
+
+    @property
+    def device_info(self):
+        """Return information to link this entity with the correct device."""
+        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
+
+    @property
+    def available(self) -> bool:
+        """To be implemented."""
+        return True
+
+    @property
+    def extra_state_attributes(self):
+        return self._extra_attr
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
+    def icon(self):
+        return ICON
+
+    @property
+    def name(self):
+        return self._attr_name
+
+    async def async_update(self):
+        await self._departure_board.async_update()
+        self._state = self._departure_board.extra_attr[self._departure]["route"]["short_name"]
+        self._extra_attr = self._departure_board.extra_attr[self._departure]
+
