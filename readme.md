@@ -1,5 +1,7 @@
 # PID Departure Board integration
 
+The custom component is current in BETA. **Beware of using it in your production instance** (may cause unexpected behaviour or crashes).
+
 This custom component provides a departures board information for the selected stops. 
 
 Multiple departure boards can be configured.
