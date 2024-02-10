@@ -20,7 +20,7 @@ class ApiCall:
         parameters = {"aswIds": stop_id, "total": conn_num, "minutesAfter": 720}
         response = requests.get(API_URL, params=parameters, headers=headers)
         reply = response.json()
-        title = reply["stops"][0]["stop_name"] + reply["stops"][0]["platform_code"]
+        title = reply["stops"][0]["stop_name"] + " " + reply["stops"][0]["platform_code"]
         if response.status_code == 200:
             return True, title
         else:

@@ -9,7 +9,7 @@ from homeassistant.components.sensor import (
 
 from datetime import timedelta
 
-from .const import ICON_BUS, ICON_TRAM, ICON_METRO,ICON_TRAIN, DOMAIN
+from .const import ICON_BUS, ICON_TRAM, ICON_METRO, ICON_TRAIN, DOMAIN
 
 
 SCAN_INTERVAL = timedelta(seconds=30)
@@ -29,6 +29,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class DepartureSensor(SensorEntity):
     """Sensor for departure."""
+    _attr_has_entity_name = True
 
     def __init__(self, departure: int, departure_board):
 
@@ -37,7 +38,7 @@ class DepartureSensor(SensorEntity):
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
 
         # The name of the entity
-        self._attr_name = f"Departure_{self._departure+1}"
+        self._attr_name = f"departure {self._departure+1}"
         self._state = self._departure_board.extra_attr[self._departure]["route"]["short_name"]
         self._extra_attr = self._departure_board.extra_attr[self._departure]
         self._route_type = self._departure_board.extra_attr[self._departure]["route"]["type"]
