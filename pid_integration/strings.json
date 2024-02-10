@@ -1,0 +1,15 @@
+{
+  "config": {
+    "step": {
+      "user": {
+          "title": "Add departure board",
+          "description": "Some description",
+          "data": {
+              "id": "Enter awsIds of the stop",
+              "api_key": "Enter API key",
+              "departures_number": "Number of departures to display"
+          }
+      }
+    }
+  }
+}
