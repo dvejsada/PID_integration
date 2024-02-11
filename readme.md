@@ -6,6 +6,10 @@ This custom component provides a departures board information for the selected s
 
 Multiple departure boards can be configured.
 
+| Device page                              |                  Sensor attributes                   |
+|:-----------------------------------------|:----------------------------------------------------:|
+| ![device page](print1.jpg "Device page") | ![sensor attributes](print2.jpg "Sensor attributes") |
+
 ## Installation
 
 ### Using [HACS](https://hacs.xyz/)
