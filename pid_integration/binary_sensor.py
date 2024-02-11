@@ -8,7 +8,7 @@ from datetime import timedelta
 from .const import ICON_INFO_ON, DOMAIN, ICON_INFO_OFF
 
 
-SCAN_INTERVAL = timedelta(seconds=30)
+SCAN_INTERVAL = timedelta(seconds=60)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):

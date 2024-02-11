@@ -15,6 +15,7 @@ ICON_PLATFORM = "mdi:bus-stop-covered"
 ICON_ZONE = "mdi:map-clock"
 ICON_INFO_ON = "mdi:alert-outline"
 ICON_INFO_OFF = "mdi:check-circle-outline"
+ICON_UPDATE = "mdi:update"
 DOMAIN = "pid_integration"
 CONF_DEP_NUM = "departures_number"
 

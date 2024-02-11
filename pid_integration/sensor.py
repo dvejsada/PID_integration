@@ -1,15 +1,15 @@
 """Platform for sensor integration."""
 from __future__ import annotations
 
-from homeassistant.components.sensor import (SensorEntity)
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
-from .const import ICON_BUS, ICON_TRAM, ICON_METRO, ICON_TRAIN, DOMAIN, ICON_STOP, ICON_WHEEL, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM
+from .const import ICON_BUS, ICON_TRAM, ICON_METRO, ICON_TRAIN, DOMAIN, ICON_STOP, ICON_WHEEL, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE
 from homeassistant.const import EntityCategory
 
 
-SCAN_INTERVAL = timedelta(seconds=30)
+SCAN_INTERVAL = timedelta(seconds=60)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -26,7 +26,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     if departure_board.platform != "":
         new_entities.append(PlatformSensor(int(departure_board.conn_num)+6, departure_board))
     # Add all entities to HA
-
+    new_entities.append(UpdateSensor(int(departure_board.conn_num) + 8, departure_board))
     async_add_entities(new_entities)
 
 
@@ -81,7 +81,6 @@ class DepartureSensor(SensorEntity):
         return self._attr_name
 
     async def async_update(self):
-        await self._departure_board.async_update()
         self._state = self._departure_board.extra_attr[self._departure]["route"]["short_name"]
         self._extra_attr = self._departure_board.extra_attr[self._departure]
 
@@ -339,3 +338,35 @@ class PlatformSensor(SensorEntity):
     @property
     def entity_category(self):
         return EntityCategory.DIAGNOSTIC
+
+
+class UpdateSensor(SensorEntity):
+    """Sensor for API update."""
+    _attr_has_entity_name = True
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = ICON_UPDATE
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, departure: int, departure_board):
+
+        self._departure = departure
+        self._departure_board = departure_board
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+
+        # The name of the entity
+        self._attr_name = f"updated"
+        self._state = datetime.now()
+
+    @property
+    def device_info(self):
+        """Return information to link this entity with the correct device."""
+        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
+
+    @property
+    def state(self):
+        return self._state
+
+    async def async_update(self):
+        await self._departure_board.async_update()
+        self._state = datetime.now()
+
