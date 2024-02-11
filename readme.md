@@ -30,7 +30,7 @@ Use the "plus" button in the bottom right to add a new integration called **PID 
 
 Fill in:
 
- - stop aswIds either from the [stops_list.txt](stops_list.txt) file in the repository (easier) 
+ - stop aswIds from the [stops_list.txt](stops_list.txt) file in the repository 
  - API key (if you don't have the API key, you can obtain it here: https://api.golemio.cz/api-keys/auth/sign-up) and 
  - number of departures to be displayed.
 
