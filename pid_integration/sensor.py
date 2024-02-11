@@ -23,7 +23,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     new_entities.append(LatSensor(int(departure_board.conn_num)+3, departure_board))
     new_entities.append(LonSensor(int(departure_board.conn_num)+4, departure_board))
     new_entities.append(ZoneSensor(int(departure_board.conn_num)+5, departure_board))
-    new_entities.append(PlatformSensor(int(departure_board.conn_num)+6, departure_board))
+    if departure_board.platform != "":
+        new_entities.append(PlatformSensor(int(departure_board.conn_num)+6, departure_board))
     # Add all entities to HA
 
     async_add_entities(new_entities)

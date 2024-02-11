@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
 from .api_call import ApiCall
-import asyncio
+
+
+def check_not_null(response):
+    if response is not None:
+        value = response
+    else:
+        value = ""
+    return value
 
 
 class DepartureBoard:
@@ -17,11 +24,11 @@ class DepartureBoard:
         self.conn_num = conn_num
         self.departures = []
         self._stop_name = response["stops"][0]["stop_name"]
-        self._name = response["stops"][0]["stop_name"] + " " + response["stops"][0]["platform_code"]
+        self._name = response["stops"][0]["stop_name"] + " " + check_not_null(response["stops"][0]["platform_code"])
         self._wheel = response["stops"][0]["wheelchair_boarding"]
         self.latitude = response["stops"][0]["stop_lat"]
         self.longitude = response["stops"][0]["stop_lon"]
-        self.platform = response["stops"][0]["platform_code"]
+        self.platform = check_not_null(response["stops"][0]["platform_code"])
         self.zone = response["stops"][0]["zone_id"]
         self.extra_attr = response["departures"]
         for i in range(self.conn_num):
