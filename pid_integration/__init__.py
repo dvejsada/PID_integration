@@ -9,7 +9,7 @@ from .const import DOMAIN, CONF_DEP_NUM
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from .api_call import ApiCall
 
-PLATFORMS: list[str] = ["sensor"]
+PLATFORMS: list[str] = ["sensor", "binary_sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
