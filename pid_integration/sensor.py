@@ -51,10 +51,6 @@ class DepartureSensor(SensorEntity):
         """Return information to link this entity with the correct device."""
         return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
 
-    @property
-    def available(self) -> bool:
-        """To be implemented."""
-        return True
 
     @property
     def extra_state_attributes(self):
@@ -76,10 +72,6 @@ class DepartureSensor(SensorEntity):
             icon = ICON_BUS
         return icon
 
-    @property
-    def name(self):
-        return self._attr_name
-
     async def async_update(self):
         self._state = self._departure_board.extra_attr[self._departure]["route"]["short_name"]
         self._extra_attr = self._departure_board.extra_attr[self._departure]
@@ -88,6 +80,8 @@ class DepartureSensor(SensorEntity):
 class StopSensor(SensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_icon = ICON_STOP
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, departure: int, departure_board):
 
@@ -114,22 +108,12 @@ class StopSensor(SensorEntity):
     def state(self):
         return self._state
 
-    @property
-    def icon(self):
-        return ICON_STOP
-
-    @property
-    def name(self):
-        return self._attr_name
-
-    @property
-    def entity_category(self):
-        return EntityCategory.DIAGNOSTIC
-
 
 class WheelchairSensor(SensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_icon = ICON_WHEEL
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, departure: int, departure_board):
 
@@ -163,22 +147,12 @@ class WheelchairSensor(SensorEntity):
             state = "not_provided"
         return state
 
-    @property
-    def icon(self):
-        return ICON_WHEEL
-
-    @property
-    def name(self):
-        return self._attr_name
-
-    @property
-    def entity_category(self):
-        return EntityCategory.DIAGNOSTIC
-
 
 class LatSensor(SensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_icon = ICON_LAT
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, departure: int, departure_board):
 
@@ -204,22 +178,12 @@ class LatSensor(SensorEntity):
     def state(self):
         return self._state
 
-    @property
-    def icon(self):
-        return ICON_LAT
-
-    @property
-    def name(self):
-        return self._attr_name
-
-    @property
-    def entity_category(self):
-        return EntityCategory.DIAGNOSTIC
-
 
 class LonSensor(SensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_icon = ICON_LON
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, departure: int, departure_board):
 
@@ -245,22 +209,12 @@ class LonSensor(SensorEntity):
     def state(self):
         return self._state
 
-    @property
-    def icon(self):
-        return ICON_LON
-
-    @property
-    def name(self):
-        return self._attr_name
-
-    @property
-    def entity_category(self):
-        return EntityCategory.DIAGNOSTIC
-
 
 class ZoneSensor(SensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_icon = ICON_ZONE
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, departure: int, departure_board):
 
@@ -286,22 +240,12 @@ class ZoneSensor(SensorEntity):
     def state(self):
         return self._state
 
-    @property
-    def icon(self):
-        return ICON_ZONE
-
-    @property
-    def name(self):
-        return self._attr_name
-
-    @property
-    def entity_category(self):
-        return EntityCategory.DIAGNOSTIC
-
 
 class PlatformSensor(SensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_icon = ICON_PLATFORM
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, departure: int, departure_board):
 
@@ -319,25 +263,8 @@ class PlatformSensor(SensorEntity):
         return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
 
     @property
-    def available(self) -> bool:
-        """To be implemented."""
-        return True
-
-    @property
     def state(self):
         return self._state
-
-    @property
-    def icon(self):
-        return ICON_PLATFORM
-
-    @property
-    def name(self):
-        return self._attr_name
-
-    @property
-    def entity_category(self):
-        return EntityCategory.DIAGNOSTIC
 
 
 class UpdateSensor(SensorEntity):
