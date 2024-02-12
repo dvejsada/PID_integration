@@ -19,7 +19,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for i in departure_board.departures:
         new_entities.append(DepartureSensor(departure_board.departures[i], departure_board))
     new_entities.append(StopSensor(int(departure_board.conn_num)+1, departure_board))
-    new_entities.append(WheelchairSensor(int(departure_board.conn_num)+2, departure_board))
     new_entities.append(LatSensor(int(departure_board.conn_num)+3, departure_board))
     new_entities.append(LonSensor(int(departure_board.conn_num)+4, departure_board))
     new_entities.append(ZoneSensor(int(departure_board.conn_num)+5, departure_board))
@@ -107,45 +106,6 @@ class StopSensor(SensorEntity):
     @property
     def state(self):
         return self._state
-
-
-class WheelchairSensor(SensorEntity):
-    """Sensor for departure."""
-    _attr_has_entity_name = True
-    _attr_icon = ICON_WHEEL
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
-
-    def __init__(self, departure: int, departure_board):
-
-        self._departure = departure
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
-
-        # The name of the entity
-        self._attr_name = f"wheelchair"
-        self._state = self._departure_board.wheelchair_accessible
-
-    @property
-    def device_info(self):
-        """Return information to link this entity with the correct device."""
-        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
-
-    @property
-    def available(self) -> bool:
-        """To be implemented."""
-        return True
-
-    @property
-    def state(self):
-        if int(self._state) == 0:
-            state = "unknown"
-        elif int(self._state) == 1:
-            state = "on"
-        elif int(self._state) == 2:
-            state = "off"
-        else:
-            state = "not_provided"
-        return state
 
 
 class LatSensor(SensorEntity):
