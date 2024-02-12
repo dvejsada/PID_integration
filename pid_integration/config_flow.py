@@ -9,9 +9,6 @@ from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant import config_entries, exceptions
 from homeassistant.core import HomeAssistant
 
-DATA_SCHEMA = vol.Schema(
-    {vol.Required(CONF_ID): str, vol.Required(CONF_API_KEY): str, vol.Required(CONF_DEP_NUM): int}
-)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +34,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
 
+        # Check for any previous instance of the integration and preload the API key.
+        if len(list(self.hass.data[DOMAIN].keys())) != 0:
+            data_schema = vol.Schema(
+                {vol.Required(CONF_ID): str, vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str,
+                vol.Required(CONF_DEP_NUM): int}
+                )
+        else:
+            data_schema = vol.Schema(
+                {vol.Required(CONF_ID): str, vol.Required(CONF_API_KEY): str,
+                 vol.Required(CONF_DEP_NUM): int}
+            )
+
         errors = {}
         if user_input is not None:
             try:
@@ -49,7 +58,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # If there is no user input or there were errors, show the form again, including any errors that were found with the input.
         return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA, errors=errors
+            step_id="user", data_schema=data_schema, errors=errors
         )
 
 

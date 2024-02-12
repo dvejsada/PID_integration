@@ -52,8 +52,12 @@ class DepartureBoard:
         """Stop name."""
         return self._stop_name
 
+    @property
+    def api_key(self) -> str:
+        return self._api_key
+
     async def async_update(self) -> None:
-        data = await self._hass.async_add_executor_job(ApiCall.update_info, self._api_key, self._stop_id, self.conn_num)
+        data = await self._hass.async_add_executor_job(ApiCall.update_info, self.api_key, self._stop_id, self.conn_num)
         self.extra_attr = data["departures"]
         self.check_infotext(data["infotexts"])
 
