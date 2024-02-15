@@ -35,7 +35,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
 
         # Check for any previous instance of the integration and preload the API key.
-        if len(list(self.hass.data[DOMAIN].keys())) != 0:
+        if DOMAIN in list(self.hass.data.keys()):
             data_schema = vol.Schema(
                 {vol.Required(CONF_ID): str, vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str,
                 vol.Required(CONF_DEP_NUM): int}
