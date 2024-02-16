@@ -3,7 +3,7 @@
     "step": {
       "user": {
           "title": "Add departure board",
-          "description": "Some description",
+          "description": "Provide configuration data. See documentation for further info.",
           "data": {
               "id": "Enter awsIds of the stop",
               "api_key": "Enter API key",
