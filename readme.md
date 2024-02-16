@@ -30,7 +30,7 @@ Use the "plus" button in the bottom right to add a new integration called **PID 
 
 Fill in:
 
- - stop aswIds from the [stops_list.txt](stops_list.txt) file in the repository 
+ - stop aswIds from the [stops_list.txt](stops_list.txt) file in the repository (e.g. "4_2" for stop Arbesovo náměstí platform B) 
  - API key (if you don't have the API key, you can obtain it here: https://api.golemio.cz/api-keys/auth/sign-up) and 
  - number of departures to be displayed.
 
