@@ -5,7 +5,7 @@ from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 
 from datetime import timedelta, datetime
 
-from .const import ICON_BUS, ICON_TRAM, ICON_METRO, ICON_TRAIN, DOMAIN, ICON_STOP, ICON_WHEEL, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE
+from .const import ICON_BUS, ICON_TRAM, ICON_METRO, ICON_TRAIN, DOMAIN, ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE
 from homeassistant.const import EntityCategory
 
 
