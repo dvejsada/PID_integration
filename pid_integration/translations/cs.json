@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+          "title": "Přidej odjezdovou tabuli",
+          "description": "Vyplň konfigurační data. Více info v dokumentaci",
+          "data": {
+              "stop_selector": "Vyber zastávku",
+              "api_key": "Vlož API klíč",
+              "departures_number": "Počet zobrazených odjezdů"
+          },
+          "data_description": {
+              "stop_selector": "Nápověda - začni psát pro hledání",
+              "api_key": "API klíč pro Golemio API"
+          }
+      }
+    }
+  }
+}

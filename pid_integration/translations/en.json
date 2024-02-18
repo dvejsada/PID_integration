@@ -10,8 +10,8 @@
               "departures_number": "Number of departures to display"
           },
           "data_description": {
-              "stop_selector": "Hint - type first 3 letters to search",
-              "api_key": "API for Golemio API"
+              "stop_selector": "Hint - type to search",
+              "api_key": "API key for Golemio API"
           }
       }
     }

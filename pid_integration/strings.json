@@ -11,7 +11,7 @@
           },
           "data_description": {
               "stop_selector": "Hint - type to search",
-              "api_key": "API for Golemio API"
+              "api_key": "API key for Golemio API"
           }
       }
     }
