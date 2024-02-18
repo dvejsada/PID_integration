@@ -3,11 +3,15 @@
     "step": {
       "user": {
           "title": "Add departure board",
-          "description": "Some description",
+          "description": "Provide configuration data. See documentation for further info.",
           "data": {
-              "id": "Enter awsIds of the stop",
+              "stop_selector": "Select the stop",
               "api_key": "Enter API key",
               "departures_number": "Number of departures to display"
+          },
+          "data_description": {
+              "stop_selector": "Hint - type first 3 letters to search",
+              "api_key": "API for Golemio API"
           }
       }
     }
