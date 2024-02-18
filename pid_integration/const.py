@@ -18,5 +18,6 @@ ICON_INFO_OFF = "mdi:check-circle-outline"
 ICON_UPDATE = "mdi:update"
 DOMAIN = "pid_integration"
 CONF_DEP_NUM = "departures_number"
+CONF_STOP_SEL = "stop_selector"
 
 

@@ -1,30 +1,34 @@
 import voluptuous as vol
 
 import logging
-from typing import Any
+from typing import Any, Tuple, Dict
 from .api_call import ApiCall
 
-from .const import DOMAIN, CONF_DEP_NUM
+from .const import DOMAIN, CONF_DEP_NUM, CONF_STOP_SEL
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant import config_entries, exceptions
 from homeassistant.core import HomeAssistant
-
+from homeassistant.helpers.selector import selector
+from .stop_list import STOP_LIST, ASW_IDS
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
+async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str], dict]:
     """Validate the user input allows us to connect.
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
-
+    try:
+        data[CONF_ID] = ASW_IDS[STOP_LIST.index(data[CONF_STOP_SEL])]
+    except Exception:
+        raise StopNotInList
     status, reply = await hass.async_add_executor_job(ApiCall.authenticate, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
     if status == 200:
         title: str = reply["stops"][0]["stop_name"] + " " + ApiCall.check_not_null(reply["stops"][0]["platform_code"])
         if data[CONF_DEP_NUM] == 0:
             raise NoDeparturesSelected
         else:
-            return {"title": title}
+            return {"title": title}, data
     elif status == 401:
         raise WrongApiKey
     elif status == 404:
@@ -43,16 +47,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Check for any previous instance of the integration
         if DOMAIN in list(self.hass.data.keys()):
             # If previous instance exists, set the API key as suggestion to new config
-            data_schema = vol.Schema(
-                {vol.Required(CONF_ID): str, vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str,
+            data_schema = {vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str,
                 vol.Required(CONF_DEP_NUM, default=1): int}
-                )
         else:
             # if no previous instance, show blank form
-            data_schema = vol.Schema(
-                {vol.Required(CONF_ID): str, vol.Required(CONF_API_KEY): str,
+            data_schema = {vol.Required(CONF_API_KEY): str,
                  vol.Required(CONF_DEP_NUM, default=1): int}
-            )
+
+        data_schema[CONF_STOP_SEL] = selector({
+                "select": {
+                    "options": STOP_LIST,
+                    "mode": "dropdown",
+                    "sort": True,
+                    "custom_value": True
+                }
+            })
 
         # Set dict for errors
         errors: dict = {}
@@ -60,8 +69,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Steps to take if user input is received
         if user_input is not None:
             try:
-                info = await validate_input(self.hass, user_input)
-                return self.async_create_entry(title=info["title"], data=user_input)
+                info, data = await validate_input(self.hass, user_input)
+                return self.async_create_entry(title=info["title"], data=data)
 
             except CannotConnect:
                 _LOGGER.exception("Unknown API connection error")
@@ -69,11 +78,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             except WrongApiKey:
                 _LOGGER.exception("The API key provided in configuration is not correct.")
-                errors["base"] = "Connection was not authorized. Wrong or no API key provided"
+                errors[CONF_API_KEY] = "Connection was not authorized. Wrong or no API key provided"
 
             except StopNotFound:
                 _LOGGER.exception("Stop with provided awsIDs was not found.")
-                errors["base"] = "Non existent awsIds provided, stop not found."
+                errors[CONF_STOP_SEL] = "Non existent awsIds provided, stop not found."
+
+            except StopNotInList:
+                _LOGGER.exception("Stop was not found in list.")
+                errors[CONF_STOP_SEL] = "Stop was not found in list - choose only stop in provided list."
 
             except NoDeparturesSelected:
                 _LOGGER.exception("Number of departures cannot be 0.")
@@ -85,7 +98,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # If there is no user input or there were errors, show the form again, including any errors that were found with the input.
         return self.async_show_form(
-            step_id="user", data_schema=data_schema, errors=errors
+            step_id="user", data_schema=vol.Schema(data_schema), errors=errors
         )
 
 
@@ -103,3 +116,7 @@ class StopNotFound(exceptions.HomeAssistantError):
 
 class NoDeparturesSelected(exceptions.HomeAssistantError):
     """Error to indicate wrong stop was provided."""
+
+
+class StopNotInList(exceptions.HomeAssistantError):
+    """Error to indicate stop not on the list was provided."""
