@@ -21,47 +21,34 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class InfotextBinarySensor(BinarySensorEntity):
     """Sensor for departure."""
     _attr_has_entity_name = True
+    _attr_device_class = BinarySensorDeviceClass.PROBLEM
 
     def __init__(self, departure_board):
 
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+7}"
-        # The name of the entity
-        self._attr_name = "infotext"
-        self._attr_state = self._departure_board.infotext_state
-        self._extra_attr = self._departure_board.infotext_attr
-
+        self._attr_is_on, self._attr_extra_state_attributes = self._departure_board.info_text
 
     @property
     def device_info(self):
         """Return information to link this entity with the correct device."""
-        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
+        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}}
 
     @property
-    def extra_state_attributes(self):
-        return self._extra_attr
-
+    def name(self) -> str:
+        """Entity name"""
+        return "infotext"
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         if self._attr_state:
             icon = ICON_INFO_ON
         else:
             icon = ICON_INFO_OFF
         return icon
 
-
-    @property
-    def is_on(self):
-        return self._attr_state
-
-    @property
-    def device_class(self):
-        return BinarySensorDeviceClass.PROBLEM
-
     async def async_update(self):
-        self._attr_state = self._departure_board.infotext_state
-        self._extra_attr = self._departure_board.infotext_attr
+        self._attr_is_on, self._attr_extra_state_attributes = self._departure_board.info_text
 
 
 class WheelchairSensor(BinarySensorEntity):
@@ -73,23 +60,25 @@ class WheelchairSensor(BinarySensorEntity):
     def __init__(self, departure_board):
 
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+2}"
-
-        # The name of the entity
-        self._attr_name = f"wheelchair"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+8}"
 
     @property
     def device_info(self):
         """Return information to link this entity with the correct device."""
-        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}, "name": self._departure_board.name}
+        return {"identifiers": {(DOMAIN, self._departure_board.board_id)}}
+
+    @property
+    def name(self):
+        """Entity name"""
+        return "wheelchair"
 
     @property
     def state(self):
-        if int(self._departure_board.wheelchair_accessible) == 0:
+        if self._departure_board.wheelchair_accessible == 0:
             state = STATE_UNKNOWN
-        elif int(self._departure_board.wheelchair_accessible) == 1:
+        elif self._departure_board.wheelchair_accessible == 1:
             state = STATE_ON
-        elif int(self._departure_board.wheelchair_accessible) == 2:
+        elif self._departure_board.wheelchair_accessible == 2:
             state = STATE_OFF
         else:
             state = STATE_UNAVAILABLE

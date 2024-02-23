@@ -4,71 +4,84 @@ from homeassistant.core import HomeAssistant
 from .api_call import ApiCall
 
 
-def check_not_null(response):
-    if response is not None:
-        value = response
-    else:
-        value = ""
-    return value
-
-
 class DepartureBoard:
     """setting Departure board device"""
+    _attr_manufacturer = "Prague Integrated Transport"
 
     def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response) -> None:
         """Init departure board."""
         self._hass = hass
         self._api_key = api_key
         self._stop_id = stop_id
-        self._id = stop_id
-        self.conn_num = conn_num
-        self.departures = []
-        self.infotext_state = ""
-        self.infotext_attr = {}
-        self._stop_name = response["stops"][0]["stop_name"]
-        self._name = response["stops"][0]["stop_name"] + " " + check_not_null(response["stops"][0]["platform_code"])
-        self._wheel = response["stops"][0]["wheelchair_boarding"]
-        self.latitude = response["stops"][0]["stop_lat"]
-        self.longitude = response["stops"][0]["stop_lon"]
-        self.platform = check_not_null(response["stops"][0]["platform_code"])
-        self.zone = response["stops"][0]["zone_id"]
-        self.extra_attr = response["departures"]
-        self.check_infotext(response["infotexts"])
-        for i in range(self.conn_num):
-            self.departures.append(i)
+        self.conn_num = int(conn_num)
+        self.response = response
 
     @property
     def board_id(self) -> str:
         """ID for departure board."""
-        return self._id
+        return self._stop_id
 
     @property
     def name(self) -> str:
         """ID for departure board."""
-        return self._name
+        return self.stop_name + " " + self.platform
 
     @property
     def stop_name(self) -> str:
         """Stop name."""
-        return self._stop_name
+        return self.response["stops"][0]["stop_name"]
+
+    @property
+    def platform(self) -> str:
+        """Platform."""
+        if self.response["stops"][0]["platform_code"] is not None:
+            value = self.response["stops"][0]["platform_code"]
+        else:
+            value = ""
+        return value
+
+    @property
+    def extra_attr(self) -> str:
+        """Extra state attributes (departures)."""
+        return self.response["departures"]
+
+    @property
+    def latitude(self) -> str:
+        """Latitude of the stop."""
+        return self.response["stops"][0]["stop_lat"]
+
+    @property
+    def longitude(self) -> str:
+        """Longitude of the stop."""
+        return self.response["stops"][0]["stop_lon"]
 
     @property
     def api_key(self) -> str:
+        """Provides API key."""
         return self._api_key
 
     async def async_update(self) -> None:
         data = await self._hass.async_add_executor_job(ApiCall.update_info, self.api_key, self._stop_id, self.conn_num)
-        self.extra_attr = data["departures"]
-        self.check_infotext(data["infotexts"])
+        self.response = data
 
     @property
     def wheelchair_accessible(self):
-        return self._wheel
+        """Wheelchair accessibility of the stop."""
+        return int(self.response["stops"][0]["wheelchair_boarding"])
 
-    def check_infotext(self, data):
-        if len(data) != 0:
-            self.infotext_state = True
-            self.infotext_attr = data[0]
+    @property
+    def zone(self) -> str:
+        """Zone of the stop"""
+        return self.response["stops"][0]["zone_id"]
+
+    @property
+    def info_text(self) -> tuple:
+        """ State and content of info text"""
+        if len(self.response["infotexts"]) != 0:
+            state = True
+            text = self.response["infotexts"][0]
         else:
-            self.infotext_state = False
-            self.infotext_attr = {}
+            state = False
+            text = {}
+
+        return state, text
