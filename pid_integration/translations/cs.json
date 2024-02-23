@@ -2,18 +2,25 @@
   "config": {
     "step": {
       "user": {
-          "title": "Přidej odjezdovou tabuli",
-          "description": "Vyplň konfigurační data. Více info v dokumentaci",
-          "data": {
-              "stop_selector": "Vyber zastávku",
-              "api_key": "Vlož API klíč",
-              "departures_number": "Počet zobrazených odjezdů"
-          },
-          "data_description": {
-              "stop_selector": "Nápověda - začni psát pro hledání",
-              "api_key": "API klíč pro Golemio API"
-          }
+        "title": "Přidej odjezdovou tabuli",
+        "description": "Vyplň konfigurační data. Více info v dokumentaci",
+        "data": {
+          "stop_selector": "Vyber zastávku",
+          "api_key": "Vlož API klíč",
+          "departures_number": "Vyber počet odjezdů k zobrazení"
+        },
+        "data_description": {
+          "stop_selector": "Začni psát k hledání",
+          "api_key": "API klíč pro Golemio API"
+        }
       }
+    },
+    "error": {
+      "cannot_connect": "Neznámá chyba připojení k API",
+      "stop_not_in_list": "Zastávka nenalezena v seznamu - vyber zastávku ze seznamu.",
+      "stop_not_found": "Zastávka s daným aswIds nenalezena.",
+      "no_departures_selected": "Počet odjezdů nemůže být 0.",
+      "wrong_api_key": "Připojení nebylo autorizováno, poskytnut chybný API klíč."
     }
   }
 }

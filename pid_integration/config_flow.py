@@ -26,7 +26,7 @@ async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str
     if status == 200:
         title: str = reply["stops"][0]["stop_name"] + " " + ApiCall.check_not_null(reply["stops"][0]["platform_code"])
         if data[CONF_DEP_NUM] == 0:
-            raise NoDeparturesSelected
+            raise NoDeparturesSelected()
         else:
             return {"title": title}, data
     elif status == 401:
@@ -73,24 +73,22 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=info["title"], data=data)
 
             except CannotConnect:
-                _LOGGER.exception("Unknown API connection error")
-                errors["base"] = "Unknown API connection error"
+                _LOGGER.exception("Cannot connect to API, check your internet connection.")
+                errors["base"] = "cannot_connect"
 
             except WrongApiKey:
-                _LOGGER.exception("The API key provided in configuration is not correct.")
-                errors[CONF_API_KEY] = "Connection was not authorized. Wrong or no API key provided"
+                _LOGGER.exception("Wrong or no API key provided, cannot authorize connection to API.")
+                errors[CONF_API_KEY] = "wrong_api_key"
 
             except StopNotFound:
-                _LOGGER.exception("Stop with provided awsIDs was not found.")
-                errors[CONF_STOP_SEL] = "Non existent awsIds provided, stop not found."
+                _LOGGER.exception("Stop was not found by the API.")
+                errors[CONF_STOP_SEL] = "stop_not_found"
 
             except StopNotInList:
-                _LOGGER.exception("Stop was not found in list.")
-                errors[CONF_STOP_SEL] = "Stop was not found in list - choose only stop in provided list."
+                errors[CONF_STOP_SEL] = "stop_not_in_list"
 
             except NoDeparturesSelected:
-                _LOGGER.exception("Number of departures cannot be 0.")
-                errors["base"] = "Number of departures cannot be 0."
+                errors[CONF_DEP_NUM] = "no_departures_selected"
 
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unknown exception")
