@@ -8,5 +8,5 @@
   "config_flow": true,
   "requirements": [],
   "issue_tracker": "https://github.com/dvejsada/PID_integration/issues",
-  "version": "0.2.3"
+  "version": "0.4.1"
 }
