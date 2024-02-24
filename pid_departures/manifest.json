@@ -1,5 +1,5 @@
 {
-  "domain": "pid_integration",
+  "domain": "pid_departures",
   "name": "PID Departure Boards",
   "codeowners": ["@dvejsada"],
   "dependencies": [],

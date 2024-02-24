@@ -16,7 +16,7 @@ ICON_ZONE = "mdi:map-clock"
 ICON_INFO_ON = "mdi:alert-outline"
 ICON_INFO_OFF = "mdi:check-circle-outline"
 ICON_UPDATE = "mdi:update"
-DOMAIN = "pid_integration"
+DOMAIN = "pid_departures"
 CONF_DEP_NUM = "departures_number"
 CONF_STOP_SEL = "stop_selector"
 
