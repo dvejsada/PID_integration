@@ -18,7 +18,7 @@ Not yet supported.
 
 ### Manual
 
-To install this integration manually you have to download pid_integration folder into your config/custom_components folder.
+To install this integration manually you have to download pid_departures folder into your config/custom_components folder.
 
 ## Configuration
 
