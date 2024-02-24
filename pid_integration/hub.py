@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
 from .api_call import ApiCall
+from collections.abc import Callable
+from .const import DOMAIN
 
 
 class DepartureBoard:
-    """setting Departure board device"""
-    _attr_manufacturer = "Prague Integrated Transport"
+    """setting Departure board as device"""
 
     def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response) -> None:
         """Init departure board."""
@@ -15,11 +16,16 @@ class DepartureBoard:
         self._stop_id = stop_id
         self.conn_num = int(conn_num)
         self.response = response
+        self._callbacks = set()
 
     @property
     def board_id(self) -> str:
         """ID for departure board."""
         return self._stop_id
+
+    @property
+    def device_info(self):
+        return {"identifiers": {(DOMAIN, self.board_id)}, "name": self.name, "manufacturer": "Prague Integrated Transport"}
 
     @property
     def name(self) -> str:
@@ -63,6 +69,20 @@ class DepartureBoard:
     async def async_update(self) -> None:
         data = await self._hass.async_add_executor_job(ApiCall.update_info, self.api_key, self._stop_id, self.conn_num)
         self.response = data
+        await self.publish_updates()
+
+    def register_callback(self, callback: Callable[[], None]) -> None:
+        """Register callback, called when there are new data."""
+        self._callbacks.add(callback)
+
+    def remove_callback(self, callback: Callable[[], None]) -> None:
+        """Remove previously registered callback."""
+        self._callbacks.discard(callback)
+
+    async def publish_updates(self) -> None:
+        """Schedule call all registered callbacks."""
+        for callback in self._callbacks:
+            callback()
 
     @property
     def wheelchair_accessible(self):
