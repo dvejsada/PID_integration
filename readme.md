@@ -37,3 +37,9 @@ Fill in:
 It is only required to fill in API key once - for additional departure boards it should be prefilled in the config dialogue.
 
 The success dialog will appear or an error will be displayed in the popup.
+
+## Dashboard
+
+The repo includes example card based on [Flex-table-card](https://github.com/custom-cards/flex-table-card) for display on dashboard.
+
+Just modify the headline and the departure entity name - number in the name shall be replaced by * to include all departures.
