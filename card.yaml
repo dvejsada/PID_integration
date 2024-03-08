@@ -1,0 +1,22 @@
+type: custom:flex-table-card
+title: [INSERT STOP NAME]
+entities:
+  include: [sensor.STOPNAME_PLATFORM_departure_*]
+columns:
+  - data: icon
+    name: []
+  - data: departure_timestamp.scheduled
+    name: TIME
+    modify: x.match(/[0-9]{2}:[0-9]{2}/);
+  - data: state
+    name: LINE
+  - data: trip.headsign
+    name: DESTINATION
+  - data: delay
+    name: DELAY
+    modify: |-
+      if (x.is_available){
+        x.minutes + " min."
+      } else {
+        "-"
+      };
