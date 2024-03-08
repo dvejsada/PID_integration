@@ -2,11 +2,11 @@
   "domain": "pid_departures",
   "name": "PID Departure Boards",
   "codeowners": ["@dvejsada"],
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/dvejsada/PID_integration/blob/master/readme.md",
   "iot_class": "cloud_polling",
-  "config_flow": true,
-  "requirements": [],
   "issue_tracker": "https://github.com/dvejsada/PID_integration/issues",
+  "requirements": [],
   "version": "0.4.1"
 }
