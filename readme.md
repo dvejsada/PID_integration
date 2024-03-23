@@ -1,8 +1,6 @@
 # PID Departure Board integration
 
-The custom component is currently in BETA. **Beware of using it in your production instance** (may cause unexpected behaviour or crashes).
-
-This custom component provides a departures board information for the selected stops. 
+This custom component provides a departures board information for the selected stops of the Prague Integrated Transport [PID](http://www.pid.cz/). 
 
 Multiple departure boards can be configured.
 
@@ -14,7 +12,9 @@ Multiple departure boards can be configured.
 
 ### Using [HACS](https://hacs.xyz/)
 
-Not yet supported.
+In HACS, go to Integrations -> Three dots in right top corner -> Custom repositories, then add url of this repo and select integration category.
+
+Next, click on the repository and Download on the right bottom corner.
 
 ### Manual
 
