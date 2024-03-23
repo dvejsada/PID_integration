@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
-from .api_call import ApiCall
+from .dep_board_api import PIDDepartureBoardAPI
 from collections.abc import Callable
 from .const import DOMAIN
 
 
 class DepartureBoard:
-    """setting Departure board as device"""
+    """Setting Departure board as device."""
 
     def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response) -> None:
-        """Init departure board."""
+        """Initialize departure board."""
         self._hass = hass
-        self._api_key = api_key
-        self._stop_id = stop_id
-        self.conn_num = int(conn_num)
+        self._api_key: str = api_key
+        self._stop_id: str = stop_id
+        self.conn_num: int = int(conn_num)
         self.response = response
         self._callbacks = set()
 
@@ -25,21 +25,22 @@ class DepartureBoard:
 
     @property
     def device_info(self):
+        """ Provides a device info. """
         return {"identifiers": {(DOMAIN, self.board_id)}, "name": self.name, "manufacturer": "Prague Integrated Transport"}
 
     @property
     def name(self) -> str:
-        """ID for departure board."""
+        """Provides name for departure board."""
         return self.stop_name + " " + self.platform
 
     @property
     def stop_name(self) -> str:
-        """Stop name."""
+        """ Provides name of the stop."""
         return self.response["stops"][0]["stop_name"]
 
     @property
     def platform(self) -> str:
-        """Platform."""
+        """ Provides platform of the stop."""
         if self.response["stops"][0]["platform_code"] is not None:
             value = self.response["stops"][0]["platform_code"]
         else:
@@ -48,26 +49,27 @@ class DepartureBoard:
 
     @property
     def extra_attr(self) -> str:
-        """Extra state attributes (departures)."""
+        """ Returns extra state attributes (departures)."""
         return self.response["departures"]
 
     @property
     def latitude(self) -> str:
-        """Latitude of the stop."""
+        """ Returns latitude of the stop."""
         return self.response["stops"][0]["stop_lat"]
 
     @property
     def longitude(self) -> str:
-        """Longitude of the stop."""
+        """Returns longitude of the stop."""
         return self.response["stops"][0]["stop_lon"]
 
     @property
     def api_key(self) -> str:
-        """Provides API key."""
+        """ Returns API key."""
         return self._api_key
 
     async def async_update(self) -> None:
-        data = await self._hass.async_add_executor_job(ApiCall.update_info, self.api_key, self._stop_id, self.conn_num)
+        """ Updates the data from API."""
+        data = await self._hass.async_add_executor_job(PIDDepartureBoardAPI.update_info, self.api_key, self._stop_id, self.conn_num)
         self.response = data
         await self.publish_updates()
 
@@ -80,13 +82,13 @@ class DepartureBoard:
         self._callbacks.discard(callback)
 
     async def publish_updates(self) -> None:
-        """Schedule call all registered callbacks."""
+        """Schedule call to all registered callbacks."""
         for callback in self._callbacks:
             callback()
 
     @property
-    def wheelchair_accessible(self):
-        """Wheelchair accessibility of the stop."""
+    def wheelchair_accessible(self) -> int:
+        """Returns wheelchair accessibility of the stop."""
         return int(self.response["stops"][0]["wheelchair_boarding"])
 
     @property

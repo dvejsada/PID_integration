@@ -2,7 +2,7 @@ import voluptuous as vol
 
 import logging
 from typing import Any, Tuple, Dict
-from .api_call import ApiCall
+from .dep_board_api import PIDDepartureBoardAPI
 
 from .const import DOMAIN, CONF_DEP_NUM, CONF_STOP_SEL
 from homeassistant.const import CONF_API_KEY, CONF_ID
@@ -22,9 +22,9 @@ async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str
         data[CONF_ID] = ASW_IDS[STOP_LIST.index(data[CONF_STOP_SEL])]
     except Exception:
         raise StopNotInList
-    status, reply = await hass.async_add_executor_job(ApiCall.authenticate, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
+    status, reply = await hass.async_add_executor_job(PIDDepartureBoardAPI.authenticate, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
     if status == 200:
-        title: str = reply["stops"][0]["stop_name"] + " " + ApiCall.check_not_null(reply["stops"][0]["platform_code"])
+        title: str = reply["stops"][0]["stop_name"] + " " + PIDDepartureBoardAPI.check_not_null(reply["stops"][0]["platform_code"])
         if data[CONF_DEP_NUM] == 0:
             raise NoDeparturesSelected()
         else:

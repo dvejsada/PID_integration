@@ -1,4 +1,4 @@
-"""Platform for sensor integration."""
+"""Platform for binary sensor."""
 from __future__ import annotations
 
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
@@ -26,12 +26,12 @@ class InfotextBinarySensor(BinarySensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "infotext"
 
     @property
@@ -74,12 +74,12 @@ class WheelchairSensor(BinarySensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self):
-        """Return entity name"""
+        """Returns entity name"""
         return "wheelchair"
 
     @property

@@ -17,8 +17,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Add sensors for passed config_entry in HA."""
     departure_board = hass.data[DOMAIN][config_entry.entry_id]
     new_entities = []
+
+    # Set entities for departures
     for i in range(departure_board.conn_num):
         new_entities.append(DepartureSensor(i, departure_board))
+
+    # Set diagnostic entities
     new_entities.append(StopSensor(departure_board.conn_num+1, departure_board))
     new_entities.append(LatSensor(departure_board.conn_num+2, departure_board))
     new_entities.append(LonSensor(departure_board.conn_num+3, departure_board))
@@ -43,30 +47,33 @@ class DepartureSensor(SensorEntity):
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
 
     @property
-    def device_info(self):
+    def device_info(self) -> str:
         """Return information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
-    def native_value(self):
+    def native_value(self) -> str:
+        """ Returns name of the route as state."""
         return self._departure_board.extra_attr[self._departure]["route"]["short_name"]
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict:
+        """ Returns dictionary of additional state attributes"""
         return self._departure_board.extra_attr[self._departure]
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return f"departure {self._departure+1}"
 
     @property
-    def route_type(self):
+    def route_type(self) -> str:
+        """ Returns the type of the route (bus/tram/metro). """
         return self._departure_board.extra_attr[self._departure]["route"]["type"]
 
     @property
-    def icon(self):
-        """Return entity icon based on the type of vehicle"""
+    def icon(self) -> str:
+        """Returns entity icon based on the type of route"""
         if int(self.route_type) == 0:
             icon = ICON_TRAM
         elif int(self.route_type) == 1:
@@ -89,7 +96,7 @@ class DepartureSensor(SensorEntity):
 
 
 class StopSensor(SensorEntity):
-    """Sensor for departure."""
+    """Sensor for stop name."""
     _attr_has_entity_name = True
     _attr_icon = ICON_STOP
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -104,17 +111,17 @@ class StopSensor(SensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "stop name"
 
 
 class LatSensor(SensorEntity):
-    """Sensor for departure."""
+    """Sensor for latitude of the stop."""
     _attr_has_entity_name = True
     _attr_icon = ICON_LAT
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -129,17 +136,17 @@ class LatSensor(SensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "latitude"
 
 
 class LonSensor(SensorEntity):
-    """Sensor for departure."""
+    """Sensor for longitude of the stop."""
     _attr_has_entity_name = True
     _attr_icon = ICON_LON
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -154,17 +161,17 @@ class LonSensor(SensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "longitude"
 
 
 class ZoneSensor(SensorEntity):
-    """Sensor for departure."""
+    """Sensor for zone."""
     _attr_has_entity_name = True
     _attr_icon = ICON_ZONE
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -179,17 +186,17 @@ class ZoneSensor(SensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "zone"
 
 
 class PlatformSensor(SensorEntity):
-    """Sensor for departure."""
+    """Sensor for platform."""
     _attr_has_entity_name = True
     _attr_icon = ICON_PLATFORM
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -204,12 +211,12 @@ class PlatformSensor(SensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "platform"
 
 
@@ -229,15 +236,16 @@ class UpdateSensor(SensorEntity):
 
     @property
     def device_info(self):
-        """Return information to link this entity with the correct device."""
+        """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
 
     @property
     def name(self) -> str:
-        """Return entity name"""
+        """Returns entity name"""
         return "updated"
 
     async def async_update(self):
+        """ Calls regular update of data from API. """
         await self._departure_board.async_update()
         self._attr_native_value = datetime.now(tz=ZoneInfo("Europe/Prague"))
 
