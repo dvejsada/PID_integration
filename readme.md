@@ -43,3 +43,5 @@ The success dialog will appear or an error will be displayed in the popup.
 The repo includes example card based on [Flex-table-card](https://github.com/custom-cards/flex-table-card) for display on dashboard.
 
 Just modify the headline and the departure entity name - number in the name shall be replaced by * to include all departures.
+
+![card](print3.jpg "Card") 
