@@ -1,6 +1,6 @@
 {
     "name": "Prague Departure Boards",
-    "filename": "custom_components.zip",
+    "filename": "pid_departures.zip",
     "hide_default_branch": true,
     "homeassistant": "2023.8.0",
     "render_readme": true,
