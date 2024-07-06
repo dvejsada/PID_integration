@@ -22,12 +22,3 @@ class PIDDepartureBoardAPI:
         response = requests.get(API_URL, params=parameters, headers=headers)
         reply = response.json()
         return response.status_code, reply
-
-    @staticmethod
-    def check_not_null(response):
-        if response is not None:
-            value = response
-        else:
-            value = ""
-        return value
-

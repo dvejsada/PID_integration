@@ -24,7 +24,7 @@ async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str
         raise StopNotInList
     status, reply = await hass.async_add_executor_job(PIDDepartureBoardAPI.authenticate, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
     if status == 200:
-        title: str = reply["stops"][0]["stop_name"] + " " + PIDDepartureBoardAPI.check_not_null(reply["stops"][0]["platform_code"])
+        title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
         if data[CONF_DEP_NUM] == 0:
             raise NoDeparturesSelected()
         else:
