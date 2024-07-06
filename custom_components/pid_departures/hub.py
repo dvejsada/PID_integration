@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 
 from homeassistant.core import HomeAssistant
 from .dep_board_api import PIDDepartureBoardAPI
@@ -48,7 +49,7 @@ class DepartureBoard:
         return value
 
     @property
-    def extra_attr(self) -> str:
+    def extra_attr(self) -> list[dict[str, Any]]:
         """ Returns extra state attributes (departures)."""
         return self.response["departures"]
 
