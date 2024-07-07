@@ -23,3 +23,6 @@ ICON_UPDATE = "mdi:update"
 DOMAIN = "pid_departures"
 CONF_DEP_NUM = "departures_number"
 CONF_STOP_SEL = "stop_selector"
+
+CAL_EVENT_MIN_DURATION_SEC = 15
+CAL_EVENTS_COUNT_LIMIT = 20

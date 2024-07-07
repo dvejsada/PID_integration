@@ -22,5 +22,26 @@
       "no_departures_selected": "Počet odjezdů nemůže být 0.",
       "wrong_api_key": "Připojení nebylo autorizováno, poskytnut chybný API klíč."
     }
+  },
+  "entity": {
+    "calendar": {
+      "departures": {
+        "name": "Vozidlo na zastávce {stop_name}",
+        "state_attributes": {
+          "route_type": {
+            "name": "Typ spoje",
+            "state": {
+              "0": "Tram",
+              "1": "Metro",
+              "2": "Vlak",
+              "3": "Bus",
+              "4": "Trajekt",
+              "7": "Lanovka",
+              "11": "Trolejbus"
+            }
+          }
+        }
+      }
+    }
   }
 }

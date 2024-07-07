@@ -9,7 +9,7 @@ from .const import DOMAIN, CONF_DEP_NUM
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from .dep_board_api import PIDDepartureBoardAPI
 
-PLATFORMS: list[str] = ["sensor", "binary_sensor"]
+PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

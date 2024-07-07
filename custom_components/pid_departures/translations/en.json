@@ -22,5 +22,26 @@
       "no_departures_selected": "Number of departures cannot be 0.",
       "wrong_api_key": "Connection was not authorized. Wrong or no API key provided."
     }
+  },
+  "entity": {
+    "calendar": {
+      "departures": {
+        "name": "Vehicle at {stop_name} stop",
+        "state_attributes": {
+          "route_type": {
+            "name": "Route type",
+            "state": {
+              "0": "Tram",
+              "1": "Metro",
+              "2": "Train",
+              "3": "Bus",
+              "4": "Ferry",
+              "7": "Funicular",
+              "11": "Trolleybus"
+            }
+          }
+        }
+      }
+    }
   }
 }
