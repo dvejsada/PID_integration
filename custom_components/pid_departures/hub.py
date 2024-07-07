@@ -1,23 +1,26 @@
 from __future__ import annotations
+
+from collections.abc import Callable
 from typing import Any
 
 from homeassistant.core import HomeAssistant
-from .dep_board_api import PIDDepartureBoardAPI
-from collections.abc import Callable
+from homeassistant.helpers.entity import DeviceInfo
+
 from .const import DOMAIN
+from .dep_board_api import PIDDepartureBoardAPI
 
 
 class DepartureBoard:
     """Setting Departure board as device."""
 
-    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response) -> None:
+    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response: dict[str, Any]) -> None:
         """Initialize departure board."""
         self._hass = hass
         self._api_key: str = api_key
         self._stop_id: str = stop_id
         self.conn_num: int = int(conn_num)
-        self.response = response
-        self._callbacks = set()
+        self.response: dict[str, Any] = response
+        self._callbacks: set[Callable[[], None]] = set()
 
     @property
     def board_id(self) -> str:
@@ -25,7 +28,7 @@ class DepartureBoard:
         return self._stop_id
 
     @property
-    def device_info(self):
+    def device_info(self) -> DeviceInfo:
         """ Provides a device info. """
         return {"identifiers": {(DOMAIN, self.board_id)}, "name": self.name, "manufacturer": "Prague Integrated Transport"}
 
@@ -37,13 +40,13 @@ class DepartureBoard:
     @property
     def stop_name(self) -> str:
         """ Provides name of the stop."""
-        return self.response["stops"][0]["stop_name"]
+        return self.response["stops"][0]["stop_name"]  # type: ignore[Any]
 
     @property
     def platform(self) -> str:
         """ Provides platform of the stop."""
         if self.response["stops"][0]["platform_code"] is not None:
-            value = self.response["stops"][0]["platform_code"]
+            value: str = self.response["stops"][0]["platform_code"]
         else:
             value = ""
         return value
@@ -51,17 +54,17 @@ class DepartureBoard:
     @property
     def extra_attr(self) -> list[dict[str, Any]]:
         """ Returns extra state attributes (departures)."""
-        return self.response["departures"]
+        return self.response["departures"]  # type: ignore[Any]
 
     @property
-    def latitude(self) -> str:
+    def latitude(self) -> float:
         """ Returns latitude of the stop."""
-        return self.response["stops"][0]["stop_lat"]
+        return self.response["stops"][0]["stop_lat"]  # type: ignore[Any]
 
     @property
-    def longitude(self) -> str:
+    def longitude(self) -> float:
         """Returns longitude of the stop."""
-        return self.response["stops"][0]["stop_lon"]
+        return self.response["stops"][0]["stop_lon"]  # type: ignore[Any]
 
     @property
     def api_key(self) -> str:
@@ -90,19 +93,19 @@ class DepartureBoard:
     @property
     def wheelchair_accessible(self) -> int:
         """Returns wheelchair accessibility of the stop."""
-        return int(self.response["stops"][0]["wheelchair_boarding"])
+        return int(self.response["stops"][0]["wheelchair_boarding"])  # type: ignore[Any]
 
     @property
     def zone(self) -> str:
         """Zone of the stop"""
-        return self.response["stops"][0]["zone_id"]
+        return self.response["stops"][0]["zone_id"]  # type: ignore[Any]
 
     @property
-    def info_text(self) -> tuple:
+    def info_text(self) -> tuple[bool, dict[str, Any]]:
         """ State and content of info text"""
-        if len(self.response["infotexts"]) != 0:
+        if len(self.response["infotexts"]) != 0:  # type: ignore[Any]
             state = True
-            text = self.response["infotexts"][0]
+            text: dict[str, Any] = self.response["infotexts"][0]
         else:
             state = False
             text = {}

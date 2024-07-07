@@ -1,30 +1,30 @@
-import voluptuous as vol
-
 import logging
-from typing import Any, Tuple, Dict
-from .dep_board_api import PIDDepartureBoardAPI
+from typing import Any
 
-from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, DOMAIN
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import selector
-from .stop_list import STOP_LIST, ASW_IDS
+import voluptuous as vol
+
+from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, DOMAIN
+from .dep_board_api import PIDDepartureBoardAPI
 from .errors import CannotConnect, NoDeparturesSelected, StopNotFound, StopNotInList, WrongApiKey
+from .stop_list import STOP_LIST, ASW_IDS
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str], dict]:
+async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> tuple[dict[str, str], dict[str, Any]]:
     """Validate the user input allows us to connect.
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
     try:
-        data[CONF_ID] = ASW_IDS[STOP_LIST.index(data[CONF_STOP_SEL])]
+        data[CONF_ID] = ASW_IDS[STOP_LIST.index(data[CONF_STOP_SEL])]  # type: ignore[Any]
     except Exception:
         raise StopNotInList
 
-    reply = await PIDDepartureBoardAPI.async_fetch_data(data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
+    reply = await PIDDepartureBoardAPI.async_fetch_data(data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])  # type: ignore[Any]
 
     title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
     if data[CONF_DEP_NUM] == 0:
@@ -38,7 +38,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
     VERSION = 0.1
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.FlowResult:
+        data_schema: dict[Any, Any]
 
         # Check for any previous instance of the integration
         if DOMAIN in list(self.hass.data.keys()):
@@ -65,7 +66,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         })
 
         # Set dict for errors
-        errors: dict = {}
+        errors: dict[str, str] = {}
 
         # Steps to take if user input is received
         if user_input is not None:

@@ -13,9 +13,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt
 
-from custom_components.pid_departures.dep_board_api import PIDDepartureBoardAPI
-
 from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN
+from .dep_board_api import PIDDepartureBoardAPI
 from .hub import DepartureBoard
 
 _LOGGER = logging.getLogger(__name__)

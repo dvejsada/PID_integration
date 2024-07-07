@@ -1,8 +1,9 @@
-import aiohttp
 from datetime import timedelta
 import logging
 from typing import Any
 from urllib.parse import urlencode
+
+import aiohttp
 
 from .const import API_URL, HTTP_TIMEOUT
 from .errors import CannotConnect, StopNotFound, WrongApiKey
