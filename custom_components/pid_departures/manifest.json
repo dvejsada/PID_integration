@@ -7,6 +7,6 @@
   "documentation": "https://github.com/dvejsada/PID_integration/blob/master/readme.md",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/dvejsada/PID_integration/issues",
-  "requirements": [],
+  "requirements": ["aiohttp"],
   "version": "1.0.0"
 }

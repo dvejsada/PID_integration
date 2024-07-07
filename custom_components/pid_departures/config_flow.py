@@ -24,7 +24,7 @@ async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str
     except Exception:
         raise StopNotInList
 
-    reply = await hass.async_add_executor_job(PIDDepartureBoardAPI.fetch_data, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
+    reply = await PIDDepartureBoardAPI.async_fetch_data(data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
 
     title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
     if data[CONF_DEP_NUM] == 0:

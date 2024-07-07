@@ -1,8 +1,12 @@
 """
 Defining constants for the project.
 """
+from aiohttp import ClientTimeout
+from typing import Final
 
 API_URL = "https://api.golemio.cz/v2/pid/departureboards/"
+HTTP_TIMEOUT: Final = ClientTimeout(total=10)
+
 ICON_BUS = "mdi:bus"
 ICON_TRAM = "mdi:tram"
 ICON_METRO = "mdi:train-variant"
@@ -19,5 +23,3 @@ ICON_UPDATE = "mdi:update"
 DOMAIN = "pid_departures"
 CONF_DEP_NUM = "departures_number"
 CONF_STOP_SEL = "stop_selector"
-
-
