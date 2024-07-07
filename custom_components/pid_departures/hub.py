@@ -70,7 +70,7 @@ class DepartureBoard:
 
     async def async_update(self) -> None:
         """ Updates the data from API."""
-        data = await self._hass.async_add_executor_job(PIDDepartureBoardAPI.update_info, self.api_key, self._stop_id, self.conn_num)
+        data = await self._hass.async_add_executor_job(PIDDepartureBoardAPI.fetch_data, self.api_key, self._stop_id, self.conn_num)
         self.response = data
         await self.publish_updates()
 

@@ -23,19 +23,14 @@ async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str
         data[CONF_ID] = ASW_IDS[STOP_LIST.index(data[CONF_STOP_SEL])]
     except Exception:
         raise StopNotInList
-    status, reply = await hass.async_add_executor_job(PIDDepartureBoardAPI.authenticate, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
-    if status == 200:
-        title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
-        if data[CONF_DEP_NUM] == 0:
-            raise NoDeparturesSelected()
-        else:
-            return {"title": title}, data
-    elif status == 401:
-        raise WrongApiKey
-    elif status == 404:
-        raise StopNotFound
+
+    reply = await hass.async_add_executor_job(PIDDepartureBoardAPI.fetch_data, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
+
+    title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
+    if data[CONF_DEP_NUM] == 0:
+        raise NoDeparturesSelected()
     else:
-        raise CannotConnect
+        return {"title": title}, data
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
