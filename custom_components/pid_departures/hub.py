@@ -15,6 +15,7 @@ class DepartureBoard:
 
     def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response: dict[str, Any]) -> None:
         """Initialize departure board."""
+        super().__init__()
         self._hass = hass
         self._api_key: str = api_key
         self._stop_id: str = stop_id

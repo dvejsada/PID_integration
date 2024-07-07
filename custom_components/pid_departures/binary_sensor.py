@@ -32,7 +32,7 @@ class InfotextBinarySensor(BinarySensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+7}"
 
@@ -80,7 +80,7 @@ class WheelchairSensor(BinarySensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+8}"
 

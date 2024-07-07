@@ -51,7 +51,7 @@ class DepartureSensor(SensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
@@ -113,7 +113,7 @@ class StopSensor(SensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
@@ -138,7 +138,7 @@ class LatSensor(SensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
@@ -163,7 +163,7 @@ class LonSensor(SensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
@@ -188,7 +188,7 @@ class ZoneSensor(SensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
@@ -213,7 +213,7 @@ class PlatformSensor(SensorEntity):
     _attr_should_poll = False
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
@@ -238,7 +238,7 @@ class UpdateSensor(SensorEntity):
     _attr_device_class = SensorDeviceClass.TIMESTAMP
 
     def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-
+        super().__init__()
         self._departure = departure
         self._departure_board = departure_board
         self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
