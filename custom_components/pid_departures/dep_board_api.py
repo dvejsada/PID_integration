@@ -22,6 +22,10 @@ class PIDDepartureBoardAPI:
             aiohttp.ClientSession(raise_for_status=False, timeout=HTTP_TIMEOUT) as http,
             http.get(API_URL, params=parameters, headers=headers) as resp
         ):
+            if _LOGGER.isEnabledFor(logging.DEBUG):
+                body = await resp.text()
+                _LOGGER.debug(f"Received response for GET {API_URL}: HTTP {resp.status}\n" +
+                              ellipsis(body, 1024))
             if resp.status == 200:
                 data: dict[str, Any] = await resp.json()
                 return data
@@ -32,3 +36,10 @@ class PIDDepartureBoardAPI:
             else:
                 _LOGGER.error(f"GET {resp.url} returned HTTP {resp.status}")
                 raise CannotConnect
+
+
+def ellipsis(text: str, maxlen: int) -> str:
+    if len(text) > maxlen:
+        return text[:(maxlen - 3)] + "..."
+    else:
+        return text
