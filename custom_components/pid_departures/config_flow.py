@@ -4,12 +4,13 @@ import logging
 from typing import Any, Tuple, Dict
 from .dep_board_api import PIDDepartureBoardAPI
 
-from .const import DOMAIN, CONF_DEP_NUM, CONF_STOP_SEL
+from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, DOMAIN
 from homeassistant.const import CONF_API_KEY, CONF_ID
-from homeassistant import config_entries, exceptions
+from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import selector
 from .stop_list import STOP_LIST, ASW_IDS
+from .errors import CannotConnect, NoDeparturesSelected, StopNotFound, StopNotInList, WrongApiKey
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,19 +23,14 @@ async def validate_input(hass: HomeAssistant, data: dict) -> tuple[dict[str, str
         data[CONF_ID] = ASW_IDS[STOP_LIST.index(data[CONF_STOP_SEL])]
     except Exception:
         raise StopNotInList
-    status, reply = await hass.async_add_executor_job(PIDDepartureBoardAPI.authenticate, data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
-    if status == 200:
-        title: str = reply["stops"][0]["stop_name"] + " " + PIDDepartureBoardAPI.check_not_null(reply["stops"][0]["platform_code"])
-        if data[CONF_DEP_NUM] == 0:
-            raise NoDeparturesSelected()
-        else:
-            return {"title": title}, data
-    elif status == 401:
-        raise WrongApiKey
-    elif status == 404:
-        raise StopNotFound
+
+    reply = await PIDDepartureBoardAPI.async_fetch_data(data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])
+
+    title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
+    if data[CONF_DEP_NUM] == 0:
+        raise NoDeparturesSelected()
     else:
-        raise CannotConnect
+        return {"title": title}, data
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -47,21 +43,26 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Check for any previous instance of the integration
         if DOMAIN in list(self.hass.data.keys()):
             # If previous instance exists, set the API key as suggestion to new config
-            data_schema = {vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str,
-                vol.Required(CONF_DEP_NUM, default=1): int}
+            data_schema = {vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str}
         else:
             # if no previous instance, show blank form
-            data_schema = {vol.Required(CONF_API_KEY): str,
-                 vol.Required(CONF_DEP_NUM, default=1): int}
+            data_schema = {vol.Required(CONF_API_KEY): str}
 
-        data_schema[CONF_STOP_SEL] = selector({
+        data_schema.update({
+            vol.Required(CONF_DEP_NUM, default=1): int,
+            CONF_STOP_SEL: selector({
                 "select": {
                     "options": STOP_LIST,
                     "mode": "dropdown",
                     "sort": True,
                     "custom_value": True
                 }
-            })
+            }),
+            vol.Optional(CONF_CAL_EVENTS_NUM, default=20): vol.All(
+                vol.Coerce(int),
+                vol.Range(0, 1000),
+            ),
+        })
 
         # Set dict for errors
         errors: dict = {}
@@ -98,23 +99,3 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=vol.Schema(data_schema), errors=errors
         )
-
-
-class CannotConnect(exceptions.HomeAssistantError):
-    """Error to indicate we cannot connect for unknown reason."""
-
-
-class WrongApiKey(exceptions.HomeAssistantError):
-    """Error to indicate wrong API key was provided."""
-
-
-class StopNotFound(exceptions.HomeAssistantError):
-    """Error to indicate wrong stop was provided."""
-
-
-class NoDeparturesSelected(exceptions.HomeAssistantError):
-    """Error to indicate wrong stop was provided."""
-
-
-class StopNotInList(exceptions.HomeAssistantError):
-    """Error to indicate stop not on the list was provided."""

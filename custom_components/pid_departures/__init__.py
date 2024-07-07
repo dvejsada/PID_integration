@@ -9,12 +9,12 @@ from .const import DOMAIN, CONF_DEP_NUM
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from .dep_board_api import PIDDepartureBoardAPI
 
-PLATFORMS: list[str] = ["sensor", "binary_sensor"]
+PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Departure Board from a config entry flow."""
-    response = await hass.async_add_executor_job(PIDDepartureBoardAPI.update_info, entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM])
+    response = await PIDDepartureBoardAPI.async_fetch_data(entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM])
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub.DepartureBoard(hass, entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM], response)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

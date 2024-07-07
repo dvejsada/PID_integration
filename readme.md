@@ -29,8 +29,9 @@ Use the "plus" button in the bottom right to add a new integration called **PID 
 Fill in:
  
  - API key (if you don't have the API key, you can obtain it here: https://api.golemio.cz/api-keys/auth/sign-up), 
- - number of departures to be displayed, and
- - choose a stop from the list.
+ - number of departures to be displayed,
+ - choose a stop from the list, and
+ - number of calendar events for departures to be created.
 
 It is only required to fill in API key once - for additional departure boards it should be prefilled in the config dialogue.
 

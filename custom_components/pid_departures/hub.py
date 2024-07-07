@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 
 from homeassistant.core import HomeAssistant
 from .dep_board_api import PIDDepartureBoardAPI
@@ -48,7 +49,7 @@ class DepartureBoard:
         return value
 
     @property
-    def extra_attr(self) -> str:
+    def extra_attr(self) -> list[dict[str, Any]]:
         """ Returns extra state attributes (departures)."""
         return self.response["departures"]
 
@@ -69,7 +70,7 @@ class DepartureBoard:
 
     async def async_update(self) -> None:
         """ Updates the data from API."""
-        data = await self._hass.async_add_executor_job(PIDDepartureBoardAPI.update_info, self.api_key, self._stop_id, self.conn_num)
+        data = await PIDDepartureBoardAPI.async_fetch_data(self.api_key, self._stop_id, self.conn_num)
         self.response = data
         await self.publish_updates()
 
