@@ -15,7 +15,7 @@ from homeassistant.util import dt
 
 from custom_components.pid_departures.dep_board_api import PIDDepartureBoardAPI
 
-from .const import DOMAIN, CAL_EVENT_MIN_DURATION_SEC, CAL_EVENTS_COUNT_LIMIT
+from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN
 from .hub import DepartureBoard
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,7 +27,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     departure_board: DepartureBoard = hass.data[DOMAIN][config_entry.entry_id]  # type: ignore[Any]
-    async_add_entities([DeparturesCalendarEntity(departure_board)])
+    events_count: int = config_entry.data[CONF_CAL_EVENTS_NUM]  # type: ignore[Any]
+    async_add_entities([
+        DeparturesCalendarEntity(departure_board, events_count=events_count),
+    ])
 
 
 class DeparturesCalendarEntity(CalendarEntity):
@@ -35,13 +38,14 @@ class DeparturesCalendarEntity(CalendarEntity):
     _attr_should_poll = False
     _attr_translation_key = "departures"
 
-    def __init__(self, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard, events_count: int) -> None:
         super().__init__()
         self._attr_unique_id = f"{departure_board.board_id}_{departure_board.conn_num}"
         self._attr_translation_placeholders = {
             "stop_name": departure_board.name,
         }
         self._departure_board = departure_board
+        self._events_count = events_count
         self._event: CalendarEvent | None = None
 
     @override
@@ -71,6 +75,8 @@ class DeparturesCalendarEntity(CalendarEntity):
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
     ) -> list[CalendarEvent]:
+        if self._events_count == 0:
+            return []
         time_before = dt.now() - start_date
         time_after = end_date - dt.now()
 
@@ -82,7 +88,7 @@ class DeparturesCalendarEntity(CalendarEntity):
         data = await PIDDepartureBoardAPI.async_fetch_data(
             self._departure_board.api_key,
             self._departure_board.board_id,
-            limit=CAL_EVENTS_COUNT_LIMIT,
+            limit=self._events_count,
             time_before=timedelta_clamp(time_before, *PIDDepartureBoardAPI.TIME_BEFORE_RANGE),
             time_after=timedelta_clamp(time_after, *PIDDepartureBoardAPI.TIME_AFTER_RANGE))
 

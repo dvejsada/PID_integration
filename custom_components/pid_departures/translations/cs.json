@@ -7,7 +7,8 @@
         "data": {
           "stop_selector": "Vyber zastávku",
           "api_key": "Vlož API klíč",
-          "departures_number": "Vyber počet odjezdů k zobrazení"
+          "departures_number": "Vyber počet odjezdů k zobrazení",
+          "cal_events_count": "Počet kalendářních událostí odjezdů"
         },
         "data_description": {
           "stop_selector": "Začni psát k hledání",

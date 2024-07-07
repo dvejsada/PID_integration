@@ -4,7 +4,7 @@ import logging
 from typing import Any, Tuple, Dict
 from .dep_board_api import PIDDepartureBoardAPI
 
-from .const import DOMAIN, CONF_DEP_NUM, CONF_STOP_SEL
+from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, DOMAIN
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
@@ -43,21 +43,26 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Check for any previous instance of the integration
         if DOMAIN in list(self.hass.data.keys()):
             # If previous instance exists, set the API key as suggestion to new config
-            data_schema = {vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str,
-                vol.Required(CONF_DEP_NUM, default=1): int}
+            data_schema = {vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str}
         else:
             # if no previous instance, show blank form
-            data_schema = {vol.Required(CONF_API_KEY): str,
-                 vol.Required(CONF_DEP_NUM, default=1): int}
+            data_schema = {vol.Required(CONF_API_KEY): str}
 
-        data_schema[CONF_STOP_SEL] = selector({
+        data_schema.update({
+            vol.Required(CONF_DEP_NUM, default=1): int,
+            CONF_STOP_SEL: selector({
                 "select": {
                     "options": STOP_LIST,
                     "mode": "dropdown",
                     "sort": True,
                     "custom_value": True
                 }
-            })
+            }),
+            vol.Optional(CONF_CAL_EVENTS_NUM, default=20): vol.All(
+                vol.Coerce(int),
+                vol.Range(0, 1000),
+            ),
+        })
 
         # Set dict for errors
         errors: dict = {}
