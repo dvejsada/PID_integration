@@ -41,24 +41,170 @@
       "departures": {
         "name": "Vehicle at {stop_name} stop",
         "state_attributes": {
+          "arrival_time_est": {
+            "name": "Arrival time (incl. delay)"
+          },
+          "arrival_time_sched": {
+            "name": "Arrival time (scheduled)"
+          },
+          "departure_time_est": {
+            "name": "Departure time (incl. delay)"
+          },
+          "departure_time_sched": {
+            "name": "Departure time (scheduled)"
+          },
+          "is_delay_avail": {
+            "name": "Delay is available"
+          },
+          "delay_sec": {
+            "name": "Delay (seconds)"
+          },
+          "route_name": {
+            "name": "Route name"
+          },
           "route_type": {
             "name": "Route type",
             "state": {
-              "0": "Tram",
-              "1": "Metro",
-              "2": "Train",
-              "3": "Bus",
-              "4": "Ferry",
-              "7": "Funicular",
-              "11": "Trolleybus"
+              "tram": "Tram",
+              "metro": "Metro",
+              "train": "Train",
+              "bus": "Bus",
+              "ferry": "Ferry",
+              "funicular": "Funicular",
+              "trolleybus": "Trolleybus"
             }
+          },
+          "train_number": {
+            "name": "Train number"
+          },
+          "trip_id": {
+            "name": "GTFS trip ID"
+          },
+          "trip_direction": {
+            "name": "Next direction"
+          },
+          "trip_headsign": {
+            "name": "Trip headsign"
+          },
+          "is_air_conditioned": {
+            "name": "Vehicle has air conditioning"
+          },
+          "is_at_stop": {
+            "name": "Vehicle is physically at stop"
+          },
+          "is_canceled": {
+            "name": "Trip is cancelled"
+          },
+          "is_night": {
+            "name": "Night route"
+          },
+          "is_regional": {
+            "name": "Suburban or regional route"
+          },
+          "is_substitute": {
+            "name": "Substitute service"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Vehicle is wheelchair accessible"
+          },
+          "last_stop_id": {
+            "name": "Last reported stop (GTFS ID)"
+          },
+          "last_stop_name": {
+            "name": "Last reported stop (name)"
+          },
+          "stop_id": {
+            "name": "Stop GTFS ID"
+          },
+          "stop_platform": {
+            "name": "Stop platform code"
           }
         }
       }
     },
     "sensor": {
       "departure": {
-        "name": "Departure {num}"
+        "name": "Departure {num}",
+        "state_attributes": {
+          "arrival_time_est": {
+            "name": "Arrival time (incl. delay)"
+          },
+          "arrival_time_sched": {
+            "name": "Arrival time (scheduled)"
+          },
+          "departure_time_est": {
+            "name": "Departure time (incl. delay)"
+          },
+          "departure_time_sched": {
+            "name": "Departure time (scheduled)"
+          },
+          "is_delay_avail": {
+            "name": "Delay is available"
+          },
+          "delay_sec": {
+            "name": "Delay (seconds)"
+          },
+          "route_name": {
+            "name": "Route name"
+          },
+          "route_type": {
+            "name": "Route type",
+            "state": {
+              "tram": "Tram",
+              "metro": "Metro",
+              "train": "Train",
+              "bus": "Bus",
+              "ferry": "Ferry",
+              "funicular": "Funicular",
+              "trolleybus": "Trolleybus"
+            }
+          },
+          "train_number": {
+            "name": "Train number"
+          },
+          "trip_id": {
+            "name": "GTFS trip ID"
+          },
+          "trip_direction": {
+            "name": "Next direction"
+          },
+          "trip_headsign": {
+            "name": "Trip headsign"
+          },
+          "is_air_conditioned": {
+            "name": "Vehicle has air conditioning"
+          },
+          "is_at_stop": {
+            "name": "Vehicle is physically at stop"
+          },
+          "is_canceled": {
+            "name": "Trip is cancelled"
+          },
+          "is_night": {
+            "name": "Night route"
+          },
+          "is_regional": {
+            "name": "Suburban or regional route"
+          },
+          "is_substitute": {
+            "name": "Substitute service"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Vehicle is wheelchair accessible"
+          },
+          "last_stop_id": {
+            "name": "Last reported stop (GTFS ID)"
+          },
+          "last_stop_name": {
+            "name": "Last reported stop (name)"
+          },
+          "stop_id": {
+            "name": "Stop GTFS ID"
+          },
+          "stop_platform": {
+            "name": "Stop platform code"
+          }
+        }
       },
       "latitude": {
         "name": "Stop location (latitude)"

@@ -2,7 +2,20 @@
 Defining constants for the project.
 """
 from aiohttp import ClientTimeout
+from enum import StrEnum, auto
 from typing import Final
+
+
+class RouteType(StrEnum):
+    UNKNOWN = auto()
+    TRAM = auto()
+    METRO = auto()
+    TRAIN = auto()
+    BUS = auto()
+    FERRY = auto()
+    FUNICULAR = auto()
+    TROLLEYBUS = auto()
+
 
 API_URL = "https://api.golemio.cz/v2/pid/departureboards/"
 HTTP_TIMEOUT: Final = ClientTimeout(total=10)
@@ -22,13 +35,13 @@ CONF_DEP_NUM = "departures_number"
 CONF_STOP_SEL = "stop_selector"
 
 ROUTE_TYPE_ICON: Final = {
-    0: "mdi:tram",
-    1: "mdi:train-variant",
-    2: "mdi:train",
-    3: "mdi:bus",
-    4: "mdi:ferry",
-    7: "mdi:gondola",
-    11: "mdi:bus-electric",
+    RouteType.TRAM: "mdi:tram",
+    RouteType.METRO: "mdi:train-variant",
+    RouteType.TRAIN: "mdi:train",
+    RouteType.BUS: "mdi:bus",
+    RouteType.FERRY: "mdi:ferry",
+    RouteType.FUNICULAR: "mdi:gondola",
+    RouteType.TROLLEYBUS: "mdi:bus-electric",
 }
 
 CAL_EVENT_MIN_DURATION_SEC = 15

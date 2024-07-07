@@ -13,7 +13,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE, ROUTE_TYPE_ICON
+from .const import DOMAIN, ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE, ROUTE_TYPE_ICON, RouteType
 from .hub import DepartureBoard
 
 SCAN_INTERVAL = timedelta(seconds=60)
@@ -66,22 +66,18 @@ class DepartureSensor(SensorEntity):
     @property
     def native_value(self) -> str:
         """ Returns name of the route as state."""
-        return self._departure_board.extra_attr[self._departure]["route"]["short_name"]
+        return self._departure_board.departures[self._departure].route_name or "?"
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any]:
         """ Returns dictionary of additional state attributes"""
-        return self._departure_board.extra_attr[self._departure]
-
-    @property
-    def route_type(self) -> str:
-        """ Returns the type of the route (bus/tram/metro). """
-        return self._departure_board.extra_attr[self._departure]["route"]["type"]
+        return self._departure_board.departures[self._departure].as_dict()
 
     @property
     def icon(self) -> str:
         """Returns entity icon based on the type of route"""
-        return ROUTE_TYPE_ICON.get(int(self.route_type), ROUTE_TYPE_ICON[3])
+        route_type = self._departure_board.departures[self._departure].route_type
+        return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""
