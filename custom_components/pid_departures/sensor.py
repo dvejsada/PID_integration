@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from homeassistant.helpers.entity import DeviceInfo, Entity
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -71,7 +71,13 @@ class DepartureSensor(SensorEntity):
     @property
     def extra_state_attributes(self) -> Mapping[str, Any]:
         """ Returns dictionary of additional state attributes"""
-        return self._departure_board.departures[self._departure].as_dict()
+        # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
+        #  the entity on the map.
+        return {
+            **self._departure_board.departures[self._departure].as_dict(),
+            CONF_LATITUDE: self._departure_board.latitude,
+            CONF_LONGITUDE: self._departure_board.longitude,
+        }
 
     @property
     def icon(self) -> str:

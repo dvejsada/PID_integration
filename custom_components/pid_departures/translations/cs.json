@@ -118,6 +118,12 @@
           },
           "stop_platform": {
             "name": "Kód stanoviště zastávky"
+          },
+          "latitude": {
+            "name": "Poloha zastávky (z.š.)"
+          },
+          "longitude": {
+            "name": "Poloha zastávky (z.d.)"
           }
         }
       }
@@ -203,6 +209,12 @@
           },
           "stop_platform": {
             "name": "Kód stanoviště zastávky"
+          },
+          "latitude": {
+            "name": "Poloha zastávky (z.š.)"
+          },
+          "longitude": {
+            "name": "Poloha zastávky (z.d.)"
           }
         }
       },

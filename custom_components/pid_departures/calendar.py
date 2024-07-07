@@ -10,6 +10,7 @@ from typing_extensions import override
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt
 
@@ -68,7 +69,13 @@ class DeparturesCalendarEntity(CalendarEntity):
     @property
     @override
     def extra_state_attributes(self) -> Mapping[str, Any]:
-        return self._departure_board.departures[0].as_dict()
+        # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
+        #  the entity on the map.
+        return {
+            **self._departure_board.departures[0].as_dict(),
+            CONF_LATITUDE: self._departure_board.latitude,
+            CONF_LONGITUDE: self._departure_board.longitude,
+        }
 
     @override
     async def async_get_events(

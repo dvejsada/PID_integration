@@ -118,6 +118,12 @@
           },
           "stop_platform": {
             "name": "Stop platform code"
+          },
+          "latitude": {
+            "name": "Stop location (latitude)"
+          },
+          "longitude": {
+            "name": "Stop location (longitude)"
           }
         }
       }
@@ -203,6 +209,12 @@
           },
           "stop_platform": {
             "name": "Stop platform code"
+          },
+          "latitude": {
+            "name": "Stop location (latitude)"
+          },
+          "longitude": {
+            "name": "Stop location (longitude)"
           }
         }
       },
