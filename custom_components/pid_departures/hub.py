@@ -13,14 +13,14 @@ from .dep_board_api import PIDDepartureBoardAPI
 class DepartureBoard:
     """Setting Departure board as device."""
 
-    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, response: dict[str, Any]) -> None:
+    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int) -> None:
         """Initialize departure board."""
         super().__init__()
         self._hass = hass
         self._api_key: str = api_key
         self._stop_id: str = stop_id
         self.conn_num: int = int(conn_num)
-        self.response: dict[str, Any] = response
+        self.response: dict[str, Any] = {}
         self._callbacks: set[Callable[[], None]] = set()
 
     @property
