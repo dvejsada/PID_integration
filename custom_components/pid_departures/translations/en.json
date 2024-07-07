@@ -25,6 +25,18 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "infotext": {
+        "name": "Infotext"
+      },
+      "wheelchair_accessible": {
+        "name": "Wheelchair accessible",
+        "state": {
+          "on": "Yes",
+          "off": "No"
+        }
+      }
+    },
     "calendar": {
       "departures": {
         "name": "Vehicle at {stop_name} stop",
@@ -42,6 +54,29 @@
             }
           }
         }
+      }
+    },
+    "sensor": {
+      "departure": {
+        "name": "Departure {num}"
+      },
+      "latitude": {
+        "name": "Stop location (latitude)"
+      },
+      "longitude": {
+        "name": "Stop location (longitude)"
+      },
+      "platform": {
+        "name": "Platform"
+      },
+      "stop_name": {
+        "name": "Stop name"
+      },
+      "updated": {
+        "name": "Updated"
+      },
+      "zone": {
+        "name": "Zone"
       }
     }
   }

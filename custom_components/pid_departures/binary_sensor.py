@@ -26,6 +26,7 @@ async def async_setup_entry(
 
 class InfotextBinarySensor(BinarySensorEntity):
     """Sensor for info text."""
+    _attr_translation_key = "infotext"
     _attr_has_entity_name = True
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -40,11 +41,6 @@ class InfotextBinarySensor(BinarySensorEntity):
     def device_info(self) -> DeviceInfo:
         """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
-
-    @property
-    def name(self) -> str:
-        """Returns entity name"""
-        return "infotext"
 
     @property
     def is_on(self) -> bool | None:
@@ -74,6 +70,7 @@ class InfotextBinarySensor(BinarySensorEntity):
 
 class WheelchairSensor(BinarySensorEntity):
     """Sensor for wheelchair accessibility of the station."""
+    _attr_translation_key = "wheelchair_accessible"
     _attr_has_entity_name = True
     _attr_icon = ICON_WHEEL
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -88,11 +85,6 @@ class WheelchairSensor(BinarySensorEntity):
     def device_info(self) -> DeviceInfo:
         """Returns information to link this entity with the correct device."""
         return self._departure_board.device_info
-
-    @property
-    def name(self) -> str:
-        """Returns entity name"""
-        return "wheelchair"
 
     @property
     def is_on(self) -> bool | None:

@@ -25,6 +25,18 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "infotext": {
+        "name": "Infotext"
+      },
+      "wheelchair_accessible": {
+        "name": "Bezbariérový spoj",
+        "state": {
+          "on": "Ano",
+          "off": "Ne"
+        }
+      }
+    },
     "calendar": {
       "departures": {
         "name": "Vozidlo na zastávce {stop_name}",
@@ -42,6 +54,29 @@
             }
           }
         }
+      }
+    },
+    "sensor": {
+      "departure": {
+        "name": "Odjezd {num}"
+      },
+      "latitude": {
+        "name": "Poloha zastávky (zem. šířka)"
+      },
+      "longitude": {
+        "name": "Poloha zastávky (zem. délka)"
+      },
+      "platform": {
+        "name": "Kód stanoviště"
+      },
+      "stop_name": {
+        "name": "Název zastávky"
+      },
+      "updated": {
+        "name": "Aktualizováno"
+      },
+      "zone": {
+        "name": "Zóna"
       }
     }
   }
