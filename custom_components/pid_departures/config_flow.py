@@ -6,10 +6,11 @@ from .dep_board_api import PIDDepartureBoardAPI
 
 from .const import DOMAIN, CONF_DEP_NUM, CONF_STOP_SEL
 from homeassistant.const import CONF_API_KEY, CONF_ID
-from homeassistant import config_entries, exceptions
+from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import selector
 from .stop_list import STOP_LIST, ASW_IDS
+from .errors import CannotConnect, NoDeparturesSelected, StopNotFound, StopNotInList, WrongApiKey
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -98,23 +99,3 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=vol.Schema(data_schema), errors=errors
         )
-
-
-class CannotConnect(exceptions.HomeAssistantError):
-    """Error to indicate we cannot connect for unknown reason."""
-
-
-class WrongApiKey(exceptions.HomeAssistantError):
-    """Error to indicate wrong API key was provided."""
-
-
-class StopNotFound(exceptions.HomeAssistantError):
-    """Error to indicate wrong stop was provided."""
-
-
-class NoDeparturesSelected(exceptions.HomeAssistantError):
-    """Error to indicate wrong stop was provided."""
-
-
-class StopNotInList(exceptions.HomeAssistantError):
-    """Error to indicate stop not on the list was provided."""
