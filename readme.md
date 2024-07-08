@@ -4,9 +4,9 @@ This custom component provides a departures board information for the selected s
 
 Multiple departure boards can be configured.
 
-| Device page                              |                  Sensor attributes                   |
-|:-----------------------------------------|:----------------------------------------------------:|
-| ![device page](print1.jpg "Device page") | ![sensor attributes](print2.jpg "Sensor attributes") |
+| Device page                                     |                  Sensor attributes                   |
+|:------------------------------------------------|:----------------------------------------------------:|
+| ![device page](assets/device.jpg "Device page") | ![sensor attributes](assets/sensor.jpg "Sensor attributes") |
 
 ## Installation
 
@@ -43,4 +43,4 @@ The repo includes example card based on [Flex-table-card](https://github.com/cus
 
 Just modify the headline and the departure entity name - number in the name shall be replaced by * to include all departures.
 
-![card](print3.jpg "Card") 
+![card](assets/card.jpg "Card") 
