@@ -13,7 +13,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ICON_BUS, ICON_TRAM, ICON_METRO, ICON_TRAIN, DOMAIN, ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE
+from .const import DOMAIN, ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE, ROUTE_TYPE_ICON
 from .hub import DepartureBoard
 
 SCAN_INTERVAL = timedelta(seconds=60)
@@ -81,15 +81,7 @@ class DepartureSensor(SensorEntity):
     @property
     def icon(self) -> str:
         """Returns entity icon based on the type of route"""
-        if int(self.route_type) == 0:
-            icon = ICON_TRAM
-        elif int(self.route_type) == 1:
-            icon = ICON_METRO
-        elif int(self.route_type) == 2:
-            icon = ICON_TRAIN
-        else:
-            icon = ICON_BUS
-        return icon
+        return ROUTE_TYPE_ICON.get(int(self.route_type), ROUTE_TYPE_ICON[3])
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""
