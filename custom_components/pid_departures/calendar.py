@@ -10,11 +10,11 @@ from typing_extensions import override
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, STATE_ON
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt
 
-from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN
+from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN, ICON_STOP, ROUTE_TYPE_ICON, RouteType
 from .dep_board_api import PIDDepartureBoardAPI
 from .hub import DepartureBoard, DepartureData
 
@@ -65,6 +65,16 @@ class DeparturesCalendarEntity(CalendarEntity):
     def event(self) -> CalendarEvent | None:
         """Return the current or next upcoming event."""
         return self._create_event(self._departure_board.departures[0])
+
+    @property
+    @override
+    def icon(self) -> str:
+        """Return entity icon based on the type of route."""
+        if self.state == STATE_ON:
+            route_type = self._departure_board.departures[0].route_type
+            return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
+        else:
+            return ICON_STOP
 
     @property
     @override
