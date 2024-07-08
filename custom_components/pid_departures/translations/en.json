@@ -40,6 +40,10 @@
     "calendar": {
       "departures": {
         "name": "Vehicle at {stop_name} stop",
+        "state": {
+          "on": "Yes",
+          "off": "No"
+        },
         "state_attributes": {
           "arrival_time_est": {
             "name": "Arrival time (incl. delay)"

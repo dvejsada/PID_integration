@@ -40,6 +40,10 @@
     "calendar": {
       "departures": {
         "name": "Vozidlo na zastávce {stop_name}",
+        "state": {
+          "on": "Ano",
+          "off": "Ne"
+        },
         "state_attributes": {
           "arrival_time_est": {
             "name": "Čas příjezdu (vč. zpoždění)"
