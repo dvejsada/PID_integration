@@ -127,13 +127,14 @@ class DeparturesCalendarEntity(CalendarEntity):
             end=end,
             summary=f"{route_type} {short_name}",
             location=self._departure_board.name,
+            description=f"Trip to {departure.trip_headsign}",
         )
 
-    def _translate(self, key_path: str) -> str | None:
+    def _translate(self, key_path: str) -> str:
         # XXX: This is hack-ish, I haven't found the right approach for this.
-        return self.platform.platform_translations.get(
+        return self.platform.platform_translations[
             f"component.{self.platform.platform_name}.entity.{self.platform.domain}" +
-            f".{self.translation_key}.{key_path}")
+            f".{self.translation_key}.{key_path}"]
 
 
 def timedelta_clamp(delta: timedelta, min: timedelta, max: timedelta) -> timedelta:
