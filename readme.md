@@ -6,7 +6,7 @@ Multiple departure boards can be configured.
 
 | Device page                                     |                  Sensor attributes                   |
 |:------------------------------------------------|:----------------------------------------------------:|
-| ![device page](assets/device.jpg "Device page") | ![sensor attributes](assets/sensor.jpg "Sensor attributes") |
+| ![device page](assets/device.en.png "Device page") | ![sensor attributes](assets/sensor.en.png "Sensor attributes") |
 
 ## Installation
 
