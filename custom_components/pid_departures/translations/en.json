@@ -133,6 +133,9 @@
       }
     },
     "sensor": {
+      "departure_time": {
+        "name": "Next departure time ({num})"
+      },
       "latitude": {
         "name": "Stop location (latitude)"
       },

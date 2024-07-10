@@ -133,6 +133,9 @@
       }
     },
     "sensor": {
+      "departure_time": {
+        "name": "Čas příštího odjezdu ({num})"
+      },
       "latitude": {
         "name": "Poloha zastávky (z.š.)"
       },
