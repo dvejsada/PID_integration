@@ -133,8 +133,17 @@
       }
     },
     "sensor": {
-      "departure": {
-        "name": "Departure {num}",
+      "latitude": {
+        "name": "Stop location (latitude)"
+      },
+      "longitude": {
+        "name": "Stop location (longitude)"
+      },
+      "platform": {
+        "name": "Platform"
+      },
+      "route_name": {
+        "name": "Next route name ({num})",
         "state_attributes": {
           "arrival_time_est": {
             "name": "Arrival time (incl. delay)"
@@ -221,15 +230,6 @@
             "name": "Stop location (longitude)"
           }
         }
-      },
-      "latitude": {
-        "name": "Stop location (latitude)"
-      },
-      "longitude": {
-        "name": "Stop location (longitude)"
-      },
-      "platform": {
-        "name": "Platform"
       },
       "stop_name": {
         "name": "Stop name"

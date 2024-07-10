@@ -30,7 +30,7 @@ async def async_setup_entry(
 
     # Set entities for departures
     for i in range(departure_board.conn_num):
-        new_entities.append(DepartureSensor(i, departure_board))
+        new_entities.append(RouteNameSensor(i, departure_board))
 
     # Set diagnostic entities
     new_entities.append(StopSensor(departure_board.conn_num+1, departure_board))
@@ -45,9 +45,9 @@ async def async_setup_entry(
     async_add_entities(new_entities)
 
 
-class DepartureSensor(SensorEntity):
-    """Sensor for departure."""
-    _attr_translation_key = "departure"
+class RouteNameSensor(SensorEntity):
+    """Sensor for departure route name."""
+    _attr_translation_key = "route_name"
     _attr_has_entity_name = True
     _attr_should_poll = False
 

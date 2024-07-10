@@ -133,8 +133,17 @@
       }
     },
     "sensor": {
-      "departure": {
-        "name": "Odjezd {num}",
+      "latitude": {
+        "name": "Poloha zastávky (z.š.)"
+      },
+      "longitude": {
+        "name": "Poloha zastávky (z.d.)"
+      },
+      "platform": {
+        "name": "Kód stanoviště"
+      },
+      "route_name": {
+        "name": "Příští linka ({num})",
         "state_attributes": {
           "arrival_time_est": {
             "name": "Čas příjezdu (vč. zpoždění)"
@@ -221,15 +230,6 @@
             "name": "Poloha zastávky (z.d.)"
           }
         }
-      },
-      "latitude": {
-        "name": "Poloha zastávky (z.š.)"
-      },
-      "longitude": {
-        "name": "Poloha zastávky (z.d.)"
-      },
-      "platform": {
-        "name": "Kód stanoviště"
       },
       "stop_name": {
         "name": "Název zastávky"
