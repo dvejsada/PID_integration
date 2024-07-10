@@ -39,7 +39,7 @@
     },
     "calendar": {
       "departures": {
-        "name": "Vehicle at {stop_name} stop",
+        "name": "Vehicle at stop",
         "state": {
           "on": "Yes",
           "off": "No"

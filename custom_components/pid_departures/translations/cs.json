@@ -39,7 +39,7 @@
     },
     "calendar": {
       "departures": {
-        "name": "Vozidlo na zastávce {stop_name}",
+        "name": "Vozidlo na zastávce",
         "state": {
           "on": "Ano",
           "off": "Ne"

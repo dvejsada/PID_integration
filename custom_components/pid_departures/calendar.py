@@ -41,9 +41,6 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
 
     def __init__(self, departure_board: DepartureBoard, events_count: int) -> None:
         super().__init__(departure_board)
-        self._attr_translation_placeholders = {
-            "stop_name": departure_board.name,
-        }
         self._events_count = events_count
         self._event: CalendarEvent | None = None
 
