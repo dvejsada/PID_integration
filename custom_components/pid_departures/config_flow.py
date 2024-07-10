@@ -40,18 +40,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 0.1
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.FlowResult:
-        data_schema: dict[Any, Any]
-
         # Check for any previous instance of the integration
+        api_key: str | None = None
         if (boards := self.hass.data.get(DOMAIN, {})):  # type: ignore[Any]
             board: DepartureBoard = next(iter(boards.values()))  # type: ignore[Any]
-            # If previous instance exists, set the API key as suggestion to new config
-            data_schema = {vol.Required(CONF_API_KEY, default=board.api_key): str}
-        else:
-            # if no previous instance, show blank form
-            data_schema = {vol.Required(CONF_API_KEY): str}
+            # If previous instance exists, use the API key as suggestion to new config
+            api_key = board.api_key
 
-        data_schema.update({
+        data_schema: dict[Any, Any] = {
+            vol.Required(CONF_API_KEY, default=api_key): str,
             vol.Required(CONF_DEP_NUM, default=1): int,
             CONF_STOP_SEL: selector({
                 "select": {
@@ -65,7 +62,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Coerce(int),
                 vol.Range(0, 1000),
             ),
-        })
+        }
 
         # Set dict for errors
         errors: dict[str, str] = {}
