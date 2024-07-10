@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, cast
 
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant import config_entries
@@ -10,6 +10,7 @@ import voluptuous as vol
 from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, DOMAIN
 from .dep_board_api import PIDDepartureBoardAPI
 from .errors import CannotConnect, NoDeparturesSelected, StopNotFound, StopNotInList, WrongApiKey
+from .hub import DepartureBoard
 from .stop_list import STOP_LIST, ASW_IDS
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,9 +43,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema: dict[Any, Any]
 
         # Check for any previous instance of the integration
-        if DOMAIN in list(self.hass.data.keys()):
+        if (boards := self.hass.data.get(DOMAIN, {})):  # type: ignore[Any]
+            board: DepartureBoard = next(iter(boards.values()))  # type: ignore[Any]
             # If previous instance exists, set the API key as suggestion to new config
-            data_schema = {vol.Required(CONF_API_KEY, default=self.hass.data[DOMAIN][list(self.hass.data[DOMAIN].keys())[0]].api_key): str}
+            data_schema = {vol.Required(CONF_API_KEY, default=board.api_key): str}
         else:
             # if no previous instance, show blank form
             data_schema = {vol.Required(CONF_API_KEY): str}
