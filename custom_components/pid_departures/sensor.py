@@ -33,13 +33,13 @@ async def async_setup_entry(
         new_entities.append(RouteNameSensor(i, departure_board))
 
     # Set diagnostic entities
-    new_entities.append(StopSensor(departure_board.conn_num+1, departure_board))
-    new_entities.append(LatSensor(departure_board.conn_num+2, departure_board))
-    new_entities.append(LonSensor(departure_board.conn_num+3, departure_board))
-    new_entities.append(ZoneSensor(departure_board.conn_num+4, departure_board))
+    new_entities.append(StopSensor(departure_board))
+    new_entities.append(LatSensor(departure_board))
+    new_entities.append(LonSensor(departure_board))
+    new_entities.append(ZoneSensor(departure_board))
     if departure_board.platform != "":
-        new_entities.append(PlatformSensor(departure_board.conn_num+5, departure_board))
-    new_entities.append(UpdateSensor(departure_board.conn_num+6, departure_board))
+        new_entities.append(PlatformSensor(departure_board))
+    new_entities.append(UpdateSensor(departure_board))
 
     # Add all entities to HA
     async_add_entities(new_entities)
@@ -104,11 +104,10 @@ class StopSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
-        self._departure = departure
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
         self._attr_native_value = self._departure_board.stop_name
 
     @property
@@ -125,11 +124,10 @@ class LatSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
-        self._departure = departure
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
         self._attr_native_value = self._departure_board.latitude
 
     @property
@@ -146,11 +144,10 @@ class LonSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
-        self._departure = departure
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
         self._attr_native_value = self._departure_board.longitude
 
     @property
@@ -167,11 +164,10 @@ class ZoneSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
-        self._departure = departure
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
         self._attr_native_value = self._departure_board.zone
 
     @property
@@ -188,11 +184,10 @@ class PlatformSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
-        self._departure = departure
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
         self._attr_native_value = self._departure_board.platform
 
     @property
@@ -209,11 +204,10 @@ class UpdateSensor(SensorEntity):
     _attr_icon = ICON_UPDATE
     _attr_device_class = SensorDeviceClass.TIMESTAMP
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
+    def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
-        self._departure = departure
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
         self._attr_native_value = datetime.now(tz=ZoneInfo("Europe/Prague"))
 
     @property

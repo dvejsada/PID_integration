@@ -35,7 +35,7 @@ class InfotextBinarySensor(BinarySensorEntity):
     def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+7}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -79,7 +79,7 @@ class WheelchairSensor(BinarySensorEntity):
     def __init__(self, departure_board: DepartureBoard) -> None:
         super().__init__()
         self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure_board.conn_num+8}"
+        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
 
     @property
     def device_info(self) -> DeviceInfo:
