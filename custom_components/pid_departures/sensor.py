@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from homeassistant.helpers.entity import DeviceInfo, Entity
+from homeassistant.helpers.entity import Entity
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, EntityCategory
@@ -14,6 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE, ROUTE_TYPE_ICON, RouteType
+from .entity import BaseEntity
 from .hub import DepartureBoard
 
 SCAN_INTERVAL = timedelta(seconds=60)
@@ -30,7 +31,7 @@ async def async_setup_entry(
 
     # Set entities for departures
     for i in range(departure_board.conn_num):
-        new_entities.append(RouteNameSensor(i, departure_board))
+        new_entities.append(RouteNameSensor(departure_board, i))
 
     # Set diagnostic entities
     new_entities.append(StopSensor(departure_board))
@@ -45,23 +46,17 @@ async def async_setup_entry(
     async_add_entities(new_entities)
 
 
-class RouteNameSensor(SensorEntity):
+class RouteNameSensor(BaseEntity, SensorEntity):
     """Sensor for departure route name."""
+
     _attr_translation_key = "route_name"
-    _attr_has_entity_name = True
     _attr_should_poll = False
 
-    def __init__(self, departure: int, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure = departure
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self._departure}"
-        self._attr_translation_placeholders = {"num": str(departure + 1)}
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return information to link this entity with the correct device."""
-        return self._departure_board.device_info
+    def __init__(self, departure_board: DepartureBoard, departure_num: int) -> None:
+        super().__init__(departure_board)
+        self._departure = departure_num
+        self._attr_unique_id = f"{departure_board.board_id}_{self.translation_key}_{departure_num + 1}"
+        self._attr_translation_placeholders = {"num": str(departure_num + 1)}
 
     @property
     def native_value(self) -> str:
@@ -85,137 +80,95 @@ class RouteNameSensor(SensorEntity):
         route_type = self._departure_board.departures[self._departure].route_type
         return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
 
-    async def async_added_to_hass(self):
+    async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
         # Sensors should also register callbacks to HA when their state changes
         self._departure_board.register_callback(self.async_write_ha_state)
 
-    async def async_will_remove_from_hass(self):
+    async def async_will_remove_from_hass(self) -> None:
         """Entity being removed from hass."""
         # The opposite of async_added_to_hass. Remove any registered call backs here.
         self._departure_board.remove_callback(self.async_write_ha_state)
 
 
-class StopSensor(SensorEntity):
+class StopSensor(BaseEntity, SensorEntity):
     """Sensor for stop name."""
+
     _attr_translation_key = "stop_name"
-    _attr_has_entity_name = True
     _attr_icon = ICON_STOP
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-        self._attr_native_value = self._departure_board.stop_name
-
     @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
+    def native_value(self) -> str:
+        return self._departure_board.stop_name
 
 
-class LatSensor(SensorEntity):
+class LatSensor(BaseEntity, SensorEntity):
     """Sensor for latitude of the stop."""
+
     _attr_translation_key = "latitude"
-    _attr_has_entity_name = True
     _attr_icon = ICON_LAT
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-        self._attr_native_value = self._departure_board.latitude
-
     @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
+    def native_value(self) -> float:
+        return self._departure_board.latitude
 
 
-class LonSensor(SensorEntity):
+class LonSensor(BaseEntity, SensorEntity):
     """Sensor for longitude of the stop."""
+
     _attr_translation_key = "longitude"
-    _attr_has_entity_name = True
     _attr_icon = ICON_LON
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-        self._attr_native_value = self._departure_board.longitude
-
     @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
+    def native_value(self) -> float:
+        return self._departure_board.longitude
 
 
-class ZoneSensor(SensorEntity):
+class ZoneSensor(BaseEntity, SensorEntity):
     """Sensor for zone."""
+
     _attr_translation_key = "zone"
-    _attr_has_entity_name = True
     _attr_icon = ICON_ZONE
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-        self._attr_native_value = self._departure_board.zone
-
     @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
+    def native_value(self) -> str:
+        return self._departure_board.zone
 
 
-class PlatformSensor(SensorEntity):
+class PlatformSensor(BaseEntity, SensorEntity):
     """Sensor for platform."""
+
     _attr_translation_key = "platform"
-    _attr_has_entity_name = True
     _attr_icon = ICON_PLATFORM
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
 
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-        self._attr_native_value = self._departure_board.platform
-
     @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
+    def native_value(self) -> str:
+        return self._departure_board.platform
 
 
-class UpdateSensor(SensorEntity):
+class UpdateSensor(BaseEntity, SensorEntity):
     """Sensor for API update."""
+
     _attr_translation_key = "updated"
-    _attr_has_entity_name = True
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_icon = ICON_UPDATE
     _attr_device_class = SensorDeviceClass.TIMESTAMP
 
     def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
+        super().__init__(departure_board)
         self._attr_native_value = datetime.now(tz=ZoneInfo("Europe/Prague"))
 
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
-
-    async def async_update(self):
+    async def async_update(self) -> None:
         """ Calls regular update of data from API. """
         await self._departure_board.async_update()
         self._attr_native_value = datetime.now(tz=ZoneInfo("Europe/Prague"))

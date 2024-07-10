@@ -16,6 +16,7 @@ from homeassistant.util import dt
 
 from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN, ICON_STOP, ROUTE_TYPE_ICON, RouteType
 from .dep_board_api import PIDDepartureBoardAPI
+from .entity import BaseEntity
 from .hub import DepartureBoard, DepartureData
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,18 +34,16 @@ async def async_setup_entry(
     ])
 
 
-class DeparturesCalendarEntity(CalendarEntity):
-    _attr_has_entity_name = True
+class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
+
     _attr_should_poll = False
     _attr_translation_key = "departures"
 
     def __init__(self, departure_board: DepartureBoard, events_count: int) -> None:
-        super().__init__()
-        self._attr_unique_id = f"{departure_board.board_id}_{departure_board.conn_num}"
+        super().__init__(departure_board)
         self._attr_translation_placeholders = {
             "stop_name": departure_board.name,
         }
-        self._departure_board = departure_board
         self._events_count = events_count
         self._event: CalendarEvent | None = None
 

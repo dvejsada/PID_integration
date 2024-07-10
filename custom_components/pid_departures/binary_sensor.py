@@ -8,10 +8,10 @@ from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySen
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import ICON_INFO_ON, DOMAIN, ICON_INFO_OFF, ICON_WHEEL
+from .entity import BaseEntity
 from .hub import DepartureBoard
 
 async def async_setup_entry(
@@ -24,23 +24,13 @@ async def async_setup_entry(
     async_add_entities([WheelchairSensor(departure_board), InfotextBinarySensor(departure_board)])
 
 
-class InfotextBinarySensor(BinarySensorEntity):
+class InfotextBinarySensor(BaseEntity, BinarySensorEntity):
     """Sensor for info text."""
+
     _attr_translation_key = "infotext"
-    _attr_has_entity_name = True
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
-
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
 
     @property
     def is_on(self) -> bool | None:
@@ -68,23 +58,13 @@ class InfotextBinarySensor(BinarySensorEntity):
         self._departure_board.remove_callback(self.async_write_ha_state)
 
 
-class WheelchairSensor(BinarySensorEntity):
+class WheelchairSensor(BaseEntity, BinarySensorEntity):
     """Sensor for wheelchair accessibility of the station."""
+
     _attr_translation_key = "wheelchair_accessible"
-    _attr_has_entity_name = True
     _attr_icon = ICON_WHEEL
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_should_poll = False
-
-    def __init__(self, departure_board: DepartureBoard) -> None:
-        super().__init__()
-        self._departure_board = departure_board
-        self._attr_unique_id = f"{self._departure_board.board_id}_{self.translation_key}"
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Returns information to link this entity with the correct device."""
-        return self._departure_board.device_info
 
     @property
     def is_on(self) -> bool | None:
