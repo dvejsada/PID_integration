@@ -4,19 +4,20 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 import logging
-from typing import Any
+from typing import Any, cast
 from typing_extensions import override
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, STATE_ON
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt
 
-from custom_components.pid_departures.dep_board_api import PIDDepartureBoardAPI
-
-from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN
-from .hub import DepartureBoard
+from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN, ICON_STOP, ROUTE_TYPE_ICON, RouteType
+from .dep_board_api import PIDDepartureBoardAPI
+from .entity import BaseEntity
+from .hub import DepartureBoard, DepartureData
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,18 +34,13 @@ async def async_setup_entry(
     ])
 
 
-class DeparturesCalendarEntity(CalendarEntity):
-    _attr_has_entity_name = True
+class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
+
     _attr_should_poll = False
     _attr_translation_key = "departures"
 
     def __init__(self, departure_board: DepartureBoard, events_count: int) -> None:
-        super().__init__()
-        self._attr_unique_id = f"{departure_board.board_id}_{departure_board.conn_num}"
-        self._attr_translation_placeholders = {
-            "stop_name": departure_board.name,
-        }
-        self._departure_board = departure_board
+        super().__init__(departure_board)
         self._events_count = events_count
         self._event: CalendarEvent | None = None
 
@@ -64,12 +60,28 @@ class DeparturesCalendarEntity(CalendarEntity):
     @override
     def event(self) -> CalendarEvent | None:
         """Return the current or next upcoming event."""
-        return self._create_event(self._departure_board.extra_attr[0])
+        return self._create_event(self._departure_board.departures[0])
+
+    @property
+    @override
+    def icon(self) -> str:
+        """Return entity icon based on the type of route."""
+        if self.state == STATE_ON:
+            route_type = self._departure_board.departures[0].route_type
+            return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
+        else:
+            return ICON_STOP
 
     @property
     @override
     def extra_state_attributes(self) -> Mapping[str, Any]:
-        return self._departure_board.extra_attr[0]
+        # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
+        #  the entity on the map.
+        return {
+            **self._departure_board.departures[0].as_dict(),
+            CONF_LATITUDE: self._departure_board.latitude,
+            CONF_LONGITUDE: self._departure_board.longitude,
+        }
 
     @override
     async def async_get_events(
@@ -92,12 +104,15 @@ class DeparturesCalendarEntity(CalendarEntity):
             time_before=timedelta_clamp(time_before, *PIDDepartureBoardAPI.TIME_BEFORE_RANGE),
             time_after=timedelta_clamp(time_after, *PIDDepartureBoardAPI.TIME_AFTER_RANGE))
 
-        events = (self._create_event(dep) for dep in data["departures"])
+        events = (
+            self._create_event(DepartureData.from_api(dep))
+            for dep in cast(list[dict[str, Any]], data["departures"])
+        )
         return [event for event in events if event]
 
-    def _create_event(self, departure: dict[str, Any]) -> CalendarEvent | None:
-        start = try_parse_timestamp(departure["arrival_timestamp"]["predicted"])  # type: ignore[Any]
-        end = try_parse_timestamp(departure["departure_timestamp"]["predicted"])  # type: ignore[Any]
+    def _create_event(self, departure: DepartureData) -> CalendarEvent | None:
+        start = departure.arrival_time_est
+        end = departure.departure_time_est
 
         if not start and not end:
             _LOGGER.error('Invalid data, both "arrival_timestamp" and "departure_timestamp" is null')
@@ -110,29 +125,22 @@ class DeparturesCalendarEntity(CalendarEntity):
             # arrival_timestamp is null on first stops.
             start = end - timedelta(seconds=CAL_EVENT_MIN_DURATION_SEC)
 
-        route_type_code: int = departure["route"]["type"]
-        route_type_name = self._translate(f"state_attributes.route_type.state.{route_type_code}")
-        short_name: str = departure["route"]["short_name"]
+        route_type = self._translate(f"state_attributes.route_type.state.{departure.route_type}")
+        short_name = departure.route_name or "?"
 
         return CalendarEvent(
             start=start,
             end=end,
-            summary=f"{route_type_name} {short_name}",
+            summary=f"{route_type} {short_name}",
             location=self._departure_board.name,
+            description=f"Trip to {departure.trip_headsign}",
         )
 
-    def _translate(self, key_path: str) -> str | None:
+    def _translate(self, key_path: str) -> str:
         # XXX: This is hack-ish, I haven't found the right approach for this.
-        return self.platform.platform_translations.get(
+        return self.platform.platform_translations[
             f"component.{self.platform.platform_name}.entity.{self.platform.domain}" +
-            f".{self.translation_key}.{key_path}")
-
-
-def try_parse_timestamp(input: str | None) -> datetime | None:
-    try:
-        return datetime.fromisoformat(input or "")
-    except ValueError:
-        return None
+            f".{self.translation_key}.{key_path}"]
 
 
 def timedelta_clamp(delta: timedelta, min: timedelta, max: timedelta) -> timedelta:

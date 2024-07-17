@@ -25,23 +25,223 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "infotext": {
+        "name": "Infotext"
+      },
+      "wheelchair_accessible": {
+        "name": "Bezbariérový spoj",
+        "state": {
+          "on": "Ano",
+          "off": "Ne"
+        }
+      }
+    },
     "calendar": {
       "departures": {
-        "name": "Vozidlo na zastávce {stop_name}",
+        "name": "Vozidlo na zastávce",
+        "state": {
+          "on": "Ano",
+          "off": "Ne"
+        },
         "state_attributes": {
+          "arrival_time_est": {
+            "name": "Čas příjezdu (vč. zpoždění)"
+          },
+          "arrival_time_sched": {
+            "name": "Čas příjezdu (plánovaný)"
+          },
+          "departure_time_est": {
+            "name": "Čas odjezdu (vč. zpoždění)"
+          },
+          "departure_time_sched": {
+            "name": "Čas odjezdu (plánovaný)"
+          },
+          "is_delay_avail": {
+            "name": "Zpoždění dostupné"
+          },
+          "delay_sec": {
+            "name": "Zpoždění (sekundy)"
+          },
+          "route_name": {
+            "name": "Číslo linky"
+          },
           "route_type": {
-            "name": "Typ spoje",
+            "name": "Typ linky",
             "state": {
-              "0": "Tram",
-              "1": "Metro",
-              "2": "Vlak",
-              "3": "Bus",
-              "4": "Trajekt",
-              "7": "Lanovka",
-              "11": "Trolejbus"
+              "tram": "Tram",
+              "metro": "Metro",
+              "train": "Vlak",
+              "bus": "Bus",
+              "ferry": "Trajekt",
+              "funicular": "Lanovka",
+              "trolleybus": "Trolejbus"
             }
+          },
+          "train_number": {
+            "name": "Číslo vlaku"
+          },
+          "trip_id": {
+            "name": "GTFS ID trasy"
+          },
+          "trip_direction": {
+            "name": "Směr další jízdy"
+          },
+          "trip_headsign": {
+            "name": "Směr spoje (cílová zastávka)"
+          },
+          "is_air_conditioned": {
+            "name": "Vozidlo má klimatizaci"
+          },
+          "is_at_stop": {
+            "name": "Vozidlo je fyzicky v zastávce"
+          },
+          "is_canceled": {
+            "name": "Spoj je zrušený"
+          },
+          "is_night": {
+            "name": "Noční linka"
+          },
+          "is_regional": {
+            "name": "Příměstská nebo regionální linka"
+          },
+          "is_substitute": {
+            "name": "Náhradní linka"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Vozidlo je bezbariérové"
+          },
+          "last_stop_id": {
+            "name": "GTFS ID poslední reportované zastávky"
+          },
+          "last_stop_name": {
+            "name": "Název poslední reportované zastávky"
+          },
+          "stop_id": {
+            "name": "GTFS ID zastávky"
+          },
+          "stop_platform": {
+            "name": "Kód stanoviště zastávky"
+          },
+          "latitude": {
+            "name": "Poloha zastávky (z.š.)"
+          },
+          "longitude": {
+            "name": "Poloha zastávky (z.d.)"
           }
         }
+      }
+    },
+    "sensor": {
+      "departure_time": {
+        "name": "Čas příštího odjezdu ({num})"
+      },
+      "latitude": {
+        "name": "Poloha zastávky (z.š.)"
+      },
+      "longitude": {
+        "name": "Poloha zastávky (z.d.)"
+      },
+      "platform": {
+        "name": "Kód stanoviště"
+      },
+      "route_name": {
+        "name": "Příští linka ({num})",
+        "state_attributes": {
+          "arrival_time_est": {
+            "name": "Čas příjezdu (vč. zpoždění)"
+          },
+          "arrival_time_sched": {
+            "name": "Čas příjezdu (plánovaný)"
+          },
+          "departure_time_est": {
+            "name": "Čas odjezdu (vč. zpoždění)"
+          },
+          "departure_time_sched": {
+            "name": "Čas odjezdu (plánovaný)"
+          },
+          "is_delay_avail": {
+            "name": "Zpoždění dostupné"
+          },
+          "delay_sec": {
+            "name": "Zpoždění (sekundy)"
+          },
+          "route_name": {
+            "name": "Číslo linky"
+          },
+          "route_type": {
+            "name": "Typ linky",
+            "state": {
+              "tram": "Tram",
+              "metro": "Metro",
+              "train": "Vlak",
+              "bus": "Bus",
+              "ferry": "Trajekt",
+              "funicular": "Lanovka",
+              "trolleybus": "Trolejbus"
+            }
+          },
+          "train_number": {
+            "name": "Číslo vlaku"
+          },
+          "trip_id": {
+            "name": "GTFS ID trasy"
+          },
+          "trip_direction": {
+            "name": "Směr další jízdy"
+          },
+          "trip_headsign": {
+            "name": "Směr spoje (cílová zastávka)"
+          },
+          "is_air_conditioned": {
+            "name": "Vozidlo má klimatizaci"
+          },
+          "is_at_stop": {
+            "name": "Vozidlo je fyzicky v zastávce"
+          },
+          "is_canceled": {
+            "name": "Spoj je zrušený"
+          },
+          "is_night": {
+            "name": "Noční linka"
+          },
+          "is_regional": {
+            "name": "Příměstská nebo regionální linka"
+          },
+          "is_substitute": {
+            "name": "Náhradní linka"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Vozidlo je bezbariérové"
+          },
+          "last_stop_id": {
+            "name": "GTFS ID poslední reportované zastávky"
+          },
+          "last_stop_name": {
+            "name": "Název poslední reportované zastávky"
+          },
+          "stop_id": {
+            "name": "GTFS ID zastávky"
+          },
+          "stop_platform": {
+            "name": "Kód stanoviště zastávky"
+          },
+          "latitude": {
+            "name": "Poloha zastávky (z.š.)"
+          },
+          "longitude": {
+            "name": "Poloha zastávky (z.d.)"
+          }
+        }
+      },
+      "stop_name": {
+        "name": "Název zastávky"
+      },
+      "updated": {
+        "name": "Aktualizováno"
+      },
+      "zone": {
+        "name": "Zóna"
       }
     }
   }

@@ -2,20 +2,21 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant.core import HomeAssistant
 
-from . import hub
 from .const import DOMAIN, CONF_DEP_NUM
-from homeassistant.const import CONF_API_KEY, CONF_ID
-from .dep_board_api import PIDDepartureBoardAPI
+from .hub import DepartureBoard
 
 PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Departure Board from a config entry flow."""
-    response = await PIDDepartureBoardAPI.async_fetch_data(entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM])
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub.DepartureBoard(hass, entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM], response)
+    hub = DepartureBoard(hass, entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM])  # type: ignore[Any]
+    await hub.async_update()
+
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub  # type: ignore[Any]
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
@@ -28,6 +29,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # details
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN].pop(entry.entry_id)  # type: ignore[Any]
 
     return unload_ok
