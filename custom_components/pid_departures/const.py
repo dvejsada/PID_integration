@@ -17,7 +17,7 @@ class RouteType(StrEnum):
     TROLLEYBUS = auto()
 
 
-API_URL = "https://api.golemio.cz/v2/pid/departureboards/"
+API_URL = "https://api.golemio.cz/v2/pid/departureboards"
 HTTP_TIMEOUT: Final = ClientTimeout(total=10)
 
 ICON_STOP = "mdi:bus-stop-uncovered"
