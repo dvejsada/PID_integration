@@ -57,8 +57,14 @@
           "departure_time_sched": {
             "name": "Čas odjezdu (plánovaný)"
           },
+          "departure_in_min": {
+            "name": "Čas odjezdu (v minutách)"
+          },
           "is_delay_avail": {
             "name": "Zpoždění dostupné"
+          },
+          "delay_min": {
+            "name": "Zpoždění (minuty)"
           },
           "delay_sec": {
             "name": "Zpoždění (sekundy)"
