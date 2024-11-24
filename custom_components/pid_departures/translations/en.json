@@ -57,8 +57,14 @@
           "departure_time_sched": {
             "name": "Departure time (scheduled)"
           },
+          "departure_in_min": {
+            "name": "Departure time (in minutes)"
+          },
           "is_delay_avail": {
             "name": "Delay is available"
+          },
+          "delay_min": {
+            "name": "Delay (minutes)"
           },
           "delay_sec": {
             "name": "Delay (seconds)"
