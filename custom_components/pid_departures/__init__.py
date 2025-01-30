@@ -14,7 +14,15 @@ PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Departure Board from a config entry flow."""
     hub = DepartureBoard(hass, entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM])  # type: ignore[Any]
-    await hub.async_update()
+    try:
+        await hub.async_update()
+    except CannotConnect:
+        # try again later again
+        raise ConfigEntryNotReady from None
+    except StopNotFound:
+        return False
+    except WrongApiKey:
+        return False
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub  # type: ignore[Any]
 
