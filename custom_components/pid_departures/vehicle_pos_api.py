@@ -20,15 +20,14 @@ class PIDVehiclePositionsAPI:
         """Get new data from Vehicle Positions API."""
         headers = {"Content-Type": "application/json; charset=utf-8", "x-access-token": api_key}
         parameters = {
-            "gtfsTripId": gtfs_trip_id,
-            "includeNotTracking": False,  # Don't enrich dataset
-            "includePositions": False,  # Only get trip info, not positions.
+            "includeNotTracking": "false",  # Don't enrich dataset
+            "includePositions": "false",  # Only get trip info, not positions.
         }
 
-        _LOGGER.debug(f"GET {VEHICLEPOS_API_URL}?{urlencode(parameters)}")
+        _LOGGER.debug(f"GET {VEHICLEPOS_API_URL}/{gtfs_trip_id}?{urlencode(parameters)}")
         async with (
             aiohttp.ClientSession(raise_for_status=False, timeout=HTTP_TIMEOUT) as http,
-            http.get(VEHICLEPOS_API_URL, params=parameters, headers=headers) as resp
+            http.get(f"{VEHICLEPOS_API_URL}/{gtfs_trip_id}", params=parameters, headers=headers) as resp
         ):
             if _LOGGER.isEnabledFor(logging.DEBUG):
                 body = await resp.text()
@@ -40,6 +39,7 @@ class PIDVehiclePositionsAPI:
             elif resp.status == 401:
                 raise WrongApiKey
             elif resp.status == 404:
+                _LOGGER.error(f"Trip with ID {gtfs_trip_id} not found: {await resp.text()}")
                 raise TripNotFound
             else:
                 _LOGGER.error(f"GET {resp.url} returned HTTP {resp.status}")

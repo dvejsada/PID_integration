@@ -6,7 +6,7 @@ from urllib.parse import urlencode
 import aiohttp
 
 from .const import API_URL, HTTP_TIMEOUT
-from .errors import CannotConnect, StopNotFound, WrongApiKey
+from .errors import CannotConnect, StopNotFound, TripNotFound, WrongApiKey
 from .vehicle_pos_api import PIDVehiclePositionsAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -50,8 +50,13 @@ class PIDDepartureBoardAPI:
                 for departure in data.get("departures", []):
                     trip_id = departure.get("trip", {}).get("id", "")
                     if trip_id:
-                        realtime_pos = await PIDVehiclePositionsAPI.async_fetch_data(api_key, trip_id)
-                        departure["realtime_position"] = realtime_pos
+                        try:
+                            # Fetch vehicle position data for the trip.
+                            # This is optional, so we don't raise an error if it fails.
+                            realtime_pos = await PIDVehiclePositionsAPI.async_fetch_data(api_key, trip_id)
+                            departure["realtime_position"] = realtime_pos
+                        except (WrongApiKey, TripNotFound, CannotConnect):
+                            pass
                 return data
             elif resp.status == 401:
                 raise WrongApiKey
