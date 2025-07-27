@@ -19,3 +19,7 @@ class StopNotInList(HomeAssistantError):
 
 class WrongApiKey(HomeAssistantError):
     """Error to indicate wrong API key was provided."""
+
+
+class TripNotFound(HomeAssistantError):
+    """Error to indicate trip not found."""

@@ -18,6 +18,7 @@ class RouteType(StrEnum):
 
 
 API_URL = "https://api.golemio.cz/v2/pid/departureboards"
+VEHICLEPOS_API_URL = "https://api.golemio.cz/v2/vehiclepositions"
 HTTP_TIMEOUT: Final = ClientTimeout(total=10)
 
 ICON_STOP = "mdi:bus-stop-uncovered"

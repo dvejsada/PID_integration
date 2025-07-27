@@ -60,6 +60,7 @@ class DepartureData:
     last_stop_name: str | None = field(metadata={"src": "last_stop.name"})
     stop_id: str = field(metadata={"src": "stop.id"})
     stop_platform: str | None = field(metadata={"src": "stop.platform_code"})
+    vehicle_registration_number: str | None = field(metadata={"src": "realtime_position.properties.trip.vehicle_registration_number", "optional": True})
 
     @staticmethod
     def from_api(data: dict[str, Any]) -> DepartureData:
@@ -67,7 +68,13 @@ class DepartureData:
         attrs: dict[str, Any] = {}
         for f in fields(DepartureData):  # type: ignore[Any]
             keypath: str = f.metadata["src"]  # type: ignore[Any]
-            attrs[f.name] = dig(data, keypath.split("."))  # type: ignore[Any]
+            try:
+                attrs[f.name] = dig(data, keypath.split("."))  # type: ignore[Any]
+            except KeyError:
+                if f.metadata.get("optional", False):
+                    attrs[f.name] = None
+                else:
+                    raise KeyError(f"Missing required field '{f.name}' in DepartureData from API response.")
         return DepartureData(**attrs)  # type: ignore[Any]
 
     def as_dict(self) -> dict[str, Any]:

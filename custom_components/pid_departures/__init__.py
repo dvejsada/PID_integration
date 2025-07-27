@@ -4,8 +4,10 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN, CONF_DEP_NUM
+from .errors import CannotConnect, StopNotFound, WrongApiKey
 from .hub import DepartureBoard
 
 PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
