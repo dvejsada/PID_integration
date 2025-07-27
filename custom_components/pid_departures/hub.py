@@ -60,6 +60,7 @@ class DepartureData:
     last_stop_name: str | None = field(metadata={"src": "last_stop.name"})
     stop_id: str = field(metadata={"src": "stop.id"})
     stop_platform: str | None = field(metadata={"src": "stop.platform_code"})
+    vehicle_registration_number: str | None = field(metadata={"src": "realtime_position.properties.trip.vehicle_registration_number"})
 
     @staticmethod
     def from_api(data: dict[str, Any]) -> DepartureData:
