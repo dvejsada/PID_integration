@@ -252,5 +252,10 @@
         "name": "Zóna"
       }
     }
+  },
+  "system_health": {
+    "info": {
+      "api_endpoint_reachable": "Stav API služby"
+    }
   }
 }

@@ -252,5 +252,10 @@
         "name": "Zone"
       }
     }
+  },
+  "system_health": {
+    "info": {
+      "api_endpoint_reachable": "API-Dienststatus"
+    }
   }
 }
