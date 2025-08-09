@@ -137,10 +137,14 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
         )
 
     def _translate(self, key_path: str) -> str:
-        # XXX: This is hack-ish, I haven't found the right approach for this.
-        return self.platform.platform_translations[
-            f"component.{self.platform.platform_name}.entity.{self.platform.domain}" +
-            f".{self.translation_key}.{key_path}"]
+        """Translate the given key path."""
+        key = (f"component.{self.platform.platform_name}.entity.{self.platform.domain}" +
+               f".{self.translation_key}.{key_path}")
+
+        if hasattr(self.platform, "platform_data"):
+            return self.platform.platform_data.platform_translations.get(key, key_path)
+        else:
+            return self.platform.platform_translations.get(key, key_path)
 
 
 def timedelta_clamp(delta: timedelta, min: timedelta, max: timedelta) -> timedelta:
