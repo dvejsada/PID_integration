@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Abfahrtstafel hinzufügen",
+        "description": "Geben Sie Konfigurationsdaten ein. Weitere Informationen finden Sie in der Dokumentation.",
+        "data": {
+          "stop_selector": "Haltestelle auswählen",
+          "api_key": "API-Schlüssel eingeben",
+          "departures_number": "Anzahl der anzuzeigenden Abfahrten",
+          "cal_events_number": "Anzahl der Kalendertermine für zu erstellende Abfahrten"
+        },
+        "data_description": {
+          "stop_selector": "Tipp - tippen Sie zum Suchen",
+          "api_key": "API-Schlüssel für Golemio API"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unbekannter API-Verbindungsfehler",
+      "stop_not_in_list": "Haltestelle wurde nicht in der Liste gefunden - wählen Sie nur eine Haltestelle aus der bereitgestellten Liste.",
+      "stop_not_found": "Haltestelle mit den angegebenen awsIDs wurde nicht gefunden.",
+      "no_departures_selected": "Anzahl der Abfahrten darf nicht 0 sein.",
+      "wrong_api_key": "Verbindung wurde nicht autorisiert. Falscher oder kein API-Schlüssel angegeben."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "infotext": {
+        "name": "Infotext"
+      },
+      "wheelchair_accessible": {
+        "name": "Rollstuhlgerecht",
+        "state": {
+          "on": "Ja",
+          "off": "Nein"
+        }
+      }
+    },
+    "calendar": {
+      "departures": {
+        "name": "Fahrzeug an Haltestelle",
+        "state": {
+          "on": "Ja",
+          "off": "Nein"
+        },
+        "state_attributes": {
+          "arrival_time_est": {
+            "name": "Ankunftszeit (inkl. Verspätung)"
+          },
+          "arrival_time_sched": {
+            "name": "Ankunftszeit (geplant)"
+          },
+          "departure_time_est": {
+            "name": "Abfahrtszeit (inkl. Verspätung)"
+          },
+          "departure_time_sched": {
+            "name": "Abfahrtszeit (geplant)"
+          },
+          "departure_in_min": {
+            "name": "Abfahrtszeit (in Minuten)"
+          },
+          "is_delay_avail": {
+            "name": "Verspätung verfügbar"
+          },
+          "delay_min": {
+            "name": "Verspätung (Minuten)"
+          },
+          "delay_sec": {
+            "name": "Verspätung (Sekunden)"
+          },
+          "route_name": {
+            "name": "Linienname"
+          },
+          "route_type": {
+            "name": "Linientyp",
+            "state": {
+              "tram": "Straßenbahn",
+              "metro": "U-Bahn",
+              "train": "Zug",
+              "bus": "Bus",
+              "ferry": "Fähre",
+              "funicular": "Seilbahn",
+              "trolleybus": "Oberleitungsbus"
+            }
+          },
+          "train_number": {
+            "name": "Zugnummer"
+          },
+          "trip_id": {
+            "name": "GTFS Fahrt-ID"
+          },
+          "trip_direction": {
+            "name": "Nächste Richtung"
+          },
+          "trip_headsign": {
+            "name": "Fahrziel"
+          },
+          "is_air_conditioned": {
+            "name": "Fahrzeug hat Klimaanlage"
+          },
+          "is_at_stop": {
+            "name": "Fahrzeug ist physisch an der Haltestelle"
+          },
+          "is_canceled": {
+            "name": "Fahrt ist ausgefallen"
+          },
+          "is_night": {
+            "name": "Nachtlinie"
+          },
+          "is_regional": {
+            "name": "Vorort- oder Regionallinie"
+          },
+          "is_substitute": {
+            "name": "Ersatzverkehr"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Fahrzeug ist rollstuhlgerecht"
+          },
+          "last_stop_id": {
+            "name": "Zuletzt gemeldete Haltestelle (GTFS ID)"
+          },
+          "last_stop_name": {
+            "name": "Zuletzt gemeldete Haltestelle (Name)"
+          },
+          "stop_id": {
+            "name": "Haltestellen GTFS ID"
+          },
+          "stop_platform": {
+            "name": "Haltestellenplattform-Code"
+          },
+          "latitude": {
+            "name": "Haltestellenposition (Breitengrad)"
+          },
+          "longitude": {
+            "name": "Haltestellenposition (Längengrad)"
+          }
+        }
+      }
+    },
+    "sensor": {
+      "departure_time": {
+        "name": "Nächste Abfahrtszeit ({num})"
+      },
+      "latitude": {
+        "name": "Haltestellenposition (Breitengrad)"
+      },
+      "longitude": {
+        "name": "Haltestellenposition (Längengrad)"
+      },
+      "platform": {
+        "name": "Plattform"
+      },
+      "route_name": {
+        "name": "Nächster Linienname ({num})",
+        "state_attributes": {
+          "arrival_time_est": {
+            "name": "Ankunftszeit (inkl. Verspätung)"
+          },
+          "arrival_time_sched": {
+            "name": "Ankunftszeit (geplant)"
+          },
+          "departure_time_est": {
+            "name": "Abfahrtszeit (inkl. Verspätung)"
+          },
+          "departure_time_sched": {
+            "name": "Abfahrtszeit (geplant)"
+          },
+          "is_delay_avail": {
+            "name": "Verspätung verfügbar"
+          },
+          "delay_sec": {
+            "name": "Verspätung (Sekunden)"
+          },
+          "route_name": {
+            "name": "Linienname"
+          },
+          "route_type": {
+            "name": "Linientyp",
+            "state": {
+              "tram": "Straßenbahn",
+              "metro": "U-Bahn",
+              "train": "Zug",
+              "bus": "Bus",
+              "ferry": "Fähre",
+              "funicular": "Seilbahn",
+              "trolleybus": "Oberleitungsbus"
+            }
+          },
+          "train_number": {
+            "name": "Zugnummer"
+          },
+          "trip_id": {
+            "name": "GTFS Fahrt-ID"
+          },
+          "trip_direction": {
+            "name": "Nächste Richtung"
+          },
+          "trip_headsign": {
+            "name": "Fahrziel"
+          },
+          "is_air_conditioned": {
+            "name": "Fahrzeug hat Klimaanlage"
+          },
+          "is_at_stop": {
+            "name": "Fahrzeug ist physisch an der Haltestelle"
+          },
+          "is_canceled": {
+            "name": "Fahrt ist ausgefallen"
+          },
+          "is_night": {
+            "name": "Nachtlinie"
+          },
+          "is_regional": {
+            "name": "Vorort- oder Regionallinie"
+          },
+          "is_substitute": {
+            "name": "Ersatzverkehr"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Fahrzeug ist rollstuhlgerecht"
+          },
+          "last_stop_id": {
+            "name": "Zuletzt gemeldete Haltestelle (GTFS ID)"
+          },
+          "last_stop_name": {
+            "name": "Zuletzt gemeldete Haltestelle (Name)"
+          },
+          "stop_id": {
+            "name": "Haltestellen GTFS ID"
+          },
+          "stop_platform": {
+            "name": "Haltestellenplattform-Code"
+          },
+          "latitude": {
+            "name": "Haltestellenposition (Breitengrad)"
+          },
+          "longitude": {
+            "name": "Haltestellenposition (Längengrad)"
+          }
+        }
+      },
+      "stop_name": {
+        "name": "Haltestellenname"
+      },
+      "updated": {
+        "name": "Aktualisiert"
+      },
+      "zone": {
+        "name": "Zone"
+      }
+    }
+  }
+}
+

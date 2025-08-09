@@ -1,0 +1,255 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pridať odchodovú tabuľu",
+        "description": "Zadajte konfiguračné údaje. Ďalšie informácie nájdete v dokumentácii.",
+        "data": {
+          "stop_selector": "Vyberte zastávku",
+          "api_key": "Zadajte API kľúč",
+          "departures_number": "Počet odchodov na zobrazenie",
+          "cal_events_number": "Počet kalendárnych udalostí pre odchody, ktoré sa majú vytvoriť"
+        },
+        "data_description": {
+          "stop_selector": "Tip - píšte pre vyhľadávanie",
+          "api_key": "API kľúč pre Golemio API"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Neznáma chyba API pripojenia",
+      "stop_not_in_list": "Zastávka nebola nájdená v zozname - vyberte iba zastávku zo zobrazeného zoznamu.",
+      "stop_not_found": "Zastávka s poskytnutými awsID nebola nájdená.",
+      "no_departures_selected": "Počet odchodov nemôže byť 0.",
+      "wrong_api_key": "Pripojenie nebolo autorizované. Bol zadaný nesprávny alebo žiadny API kľúč."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "infotext": {
+        "name": "Informačný text"
+      },
+      "wheelchair_accessible": {
+        "name": "Prístupné pre invalidný vozík",
+        "state": {
+          "on": "Áno",
+          "off": "Nie"
+        }
+      }
+    },
+    "calendar": {
+      "departures": {
+        "name": "Vozidlo na zastávke",
+        "state": {
+          "on": "Áno",
+          "off": "Nie"
+        },
+        "state_attributes": {
+          "arrival_time_est": {
+            "name": "Čas príchodu (vrátane meškania)"
+          },
+          "arrival_time_sched": {
+            "name": "Čas príchodu (plánovaný)"
+          },
+          "departure_time_est": {
+            "name": "Čas odchodu (vrátane meškania)"
+          },
+          "departure_time_sched": {
+            "name": "Čas odchodu (plánovaný)"
+          },
+          "departure_in_min": {
+            "name": "Čas odchodu (v minútach)"
+          },
+          "is_delay_avail": {
+            "name": "Meškanie je dostupné"
+          },
+          "delay_min": {
+            "name": "Meškanie (minúty)"
+          },
+          "delay_sec": {
+            "name": "Meškanie (sekundy)"
+          },
+          "route_name": {
+            "name": "Názov trasy"
+          },
+          "route_type": {
+            "name": "Typ trasy",
+            "state": {
+              "tram": "Električka",
+              "metro": "Metro",
+              "train": "Vlak",
+              "bus": "Autobus",
+              "ferry": "Trajekt",
+              "funicular": "Lanová dráha",
+              "trolleybus": "Trolejbus"
+            }
+          },
+          "train_number": {
+            "name": "Číslo vlaku"
+          },
+          "trip_id": {
+            "name": "GTFS ID cesty"
+          },
+          "trip_direction": {
+            "name": "Ďalší smer"
+          },
+          "trip_headsign": {
+            "name": "Cieľ cesty"
+          },
+          "is_air_conditioned": {
+            "name": "Vozidlo má klimatizáciu"
+          },
+          "is_at_stop": {
+            "name": "Vozidlo je fyzicky na zastávke"
+          },
+          "is_canceled": {
+            "name": "Cesta je zrušená"
+          },
+          "is_night": {
+            "name": "Nočná trasa"
+          },
+          "is_regional": {
+            "name": "Prímestská alebo regionálna trasa"
+          },
+          "is_substitute": {
+            "name": "Náhradná doprava"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Vozidlo je prístupné pre invalidný vozík"
+          },
+          "last_stop_id": {
+            "name": "Posledná hlásená zastávka (GTFS ID)"
+          },
+          "last_stop_name": {
+            "name": "Posledná hlásená zastávka (názov)"
+          },
+          "stop_id": {
+            "name": "GTFS ID zastávky"
+          },
+          "stop_platform": {
+            "name": "Kód nástupiška zastávky"
+          },
+          "latitude": {
+            "name": "Poloha zastávky (zemepisná šírka)"
+          },
+          "longitude": {
+            "name": "Poloha zastávky (zemepisná dĺžka)"
+          }
+        }
+      }
+    },
+    "sensor": {
+      "departure_time": {
+        "name": "Čas ďalšieho odchodu ({num})"
+      },
+      "latitude": {
+        "name": "Poloha zastávky (zemepisná šírka)"
+      },
+      "longitude": {
+        "name": "Poloha zastávky (zemepisná dĺžka)"
+      },
+      "platform": {
+        "name": "Nástupisko"
+      },
+      "route_name": {
+        "name": "Názov ďalšej trasy ({num})",
+        "state_attributes": {
+          "arrival_time_est": {
+            "name": "Čas príchodu (vrátane meškania)"
+          },
+          "arrival_time_sched": {
+            "name": "Čas príchodu (plánovaný)"
+          },
+          "departure_time_est": {
+            "name": "Čas odchodu (vrátane meškania)"
+          },
+          "departure_time_sched": {
+            "name": "Čas odchodu (plánovaný)"
+          },
+          "is_delay_avail": {
+            "name": "Meškanie je dostupné"
+          },
+          "delay_sec": {
+            "name": "Meškanie (sekundy)"
+          },
+          "route_name": {
+            "name": "Názov trasy"
+          },
+          "route_type": {
+            "name": "Typ trasy",
+            "state": {
+              "tram": "Električka",
+              "metro": "Metro",
+              "train": "Vlak",
+              "bus": "Autobus",
+              "ferry": "Trajekt",
+              "funicular": "Lanová dráha",
+              "trolleybus": "Trolejbus"
+            }
+          },
+          "train_number": {
+            "name": "Číslo vlaku"
+          },
+          "trip_id": {
+            "name": "GTFS ID cesty"
+          },
+          "trip_direction": {
+            "name": "Ďalší smer"
+          },
+          "trip_headsign": {
+            "name": "Cieľ cesty"
+          },
+          "is_air_conditioned": {
+            "name": "Vozidlo má klimatizáciu"
+          },
+          "is_at_stop": {
+            "name": "Vozidlo je fyzicky na zastávke"
+          },
+          "is_canceled": {
+            "name": "Cesta je zrušená"
+          },
+          "is_night": {
+            "name": "Nočná trasa"
+          },
+          "is_regional": {
+            "name": "Prímestská alebo regionálna trasa"
+          },
+          "is_substitute": {
+            "name": "Náhradná doprava"
+          },
+          "is_wheelchair_accessible": {
+            "name": "Vozidlo je prístupné pre invalidný vozík"
+          },
+          "last_stop_id": {
+            "name": "Posledná hlásená zastávka (GTFS ID)"
+          },
+          "last_stop_name": {
+            "name": "Posledná hlásená zastávka (názov)"
+          },
+          "stop_id": {
+            "name": "GTFS ID zastávky"
+          },
+          "stop_platform": {
+            "name": "Kód nástupiška zastávky"
+          },
+          "latitude": {
+            "name": "Poloha zastávky (zemepisná šírka)"
+          },
+          "longitude": {
+            "name": "Poloha zastávky (zemepisná dĺžka)"
+          }
+        }
+      },
+      "stop_name": {
+        "name": "Názov zastávky"
+      },
+      "updated": {
+        "name": "Aktualizované"
+      },
+      "zone": {
+        "name": "Zóna"
+      }
+    }
+  }
+}
+
