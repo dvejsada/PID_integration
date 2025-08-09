@@ -33,6 +33,7 @@ DOMAIN = "pid_departures"
 CONF_CAL_EVENTS_NUM = "cal_events_number"
 CONF_DEP_NUM = "departures_number"
 CONF_STOP_SEL = "stop_selector"
+CONF_WALKING_OFFSET = "walking_offset"
 
 ROUTE_TYPE_ICON: Final = {
     RouteType.TRAM: "mdi:tram",

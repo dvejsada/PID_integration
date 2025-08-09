@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from attrs import asdict, converters, define, field, fields
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, cast
 
@@ -78,13 +78,14 @@ class DepartureData:
 class DepartureBoard:
     """Setting Departure board as device."""
 
-    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int) -> None:
+    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, walking_offset: int = 0) -> None:
         """Initialize departure board."""
         super().__init__()
         self._hass = hass
         self._api_key: str = api_key
         self._stop_id: str = stop_id
         self.conn_num: int = int(conn_num)
+        self.walking_offset: int = walking_offset  # User input in minutes (positive = future)
         self.response: dict[str, Any] = {}
         self._departures: list[DepartureData] = []
         self._callbacks: set[Callable[[], None]] = set()
@@ -140,7 +141,19 @@ class DepartureBoard:
 
     async def async_update(self) -> None:
         """ Updates the data from API."""
-        data = await PIDDepartureBoardAPI.async_fetch_data(self.api_key, self._stop_id, self.conn_num)
+        # Convert user-friendly walking offset to API format
+        # User: positive = future, negative = past (intuitive)
+        # API: positive = past, negative = future (counter-intuitive)
+        # So we invert the sign and convert minutes to timedelta
+        api_offset_minutes = -self.walking_offset
+        walking_offset_timedelta = timedelta(minutes=api_offset_minutes)
+
+        data = await PIDDepartureBoardAPI.async_fetch_data(
+            self.api_key,
+            self._stop_id,
+            self.conn_num,
+            time_before=walking_offset_timedelta
+        )
         self.response = data
         self._departures = [DepartureData.from_api(dep)
                             for dep in cast(list[dict[str, Any]], data["departures"])]

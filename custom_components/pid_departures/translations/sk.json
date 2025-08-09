@@ -8,11 +8,13 @@
           "stop_selector": "Vyberte zastávku",
           "api_key": "Zadajte API kľúč",
           "departures_number": "Počet odchodov na zobrazenie",
-          "cal_events_number": "Počet kalendárnych udalostí pre odchody, ktoré sa majú vytvoriť"
+          "cal_events_number": "Počet kalendárnych udalostí pre odchody, ktoré sa majú vytvoriť",
+          "walking_offset": "Časový posun pre chôdzu (minúty)"
         },
         "data_description": {
           "stop_selector": "Tip - píšte pre vyhľadávanie",
-          "api_key": "API kľúč pre Golemio API"
+          "api_key": "API kľúč pre Golemio API",
+          "walking_offset": "Posun na kompenzáciu vzdialenosti chôdze k zastávke (kladné = zobrazí budúce odchody, záporné = zobrazí minulé odchody)"
         }
       }
     },
@@ -252,4 +254,3 @@
     }
   }
 }
-

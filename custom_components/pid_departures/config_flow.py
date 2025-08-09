@@ -1,5 +1,6 @@
 import logging
 from typing import Any, cast
+from datetime import timedelta
 
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant import config_entries
@@ -7,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import selector
 import voluptuous as vol
 
-from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, DOMAIN
+from .const import CONF_CAL_EVENTS_NUM, CONF_DEP_NUM, CONF_STOP_SEL, CONF_WALKING_OFFSET, DOMAIN
 from .dep_board_api import PIDDepartureBoardAPI
 from .errors import CannotConnect, NoDeparturesSelected, StopNotFound, StopNotInList, WrongApiKey
 from .hub import DepartureBoard
@@ -25,7 +26,21 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> tuple[dic
     except Exception:
         raise StopNotInList
 
-    reply = await PIDDepartureBoardAPI.async_fetch_data(data[CONF_API_KEY], data[CONF_ID], data[CONF_DEP_NUM])  # type: ignore[Any]
+    # Get walking offset in minutes (user input) and convert to API format
+    user_offset_minutes = data.get(CONF_WALKING_OFFSET, 0)
+    # Convert user-friendly format to API format:
+    # User: positive = future, negative = past
+    # API: positive = past, negative = future
+    # So we need to invert the sign
+    api_offset_minutes = -user_offset_minutes
+    walking_offset_timedelta = timedelta(minutes=api_offset_minutes)
+
+    reply = await PIDDepartureBoardAPI.async_fetch_data(
+        data[CONF_API_KEY],
+        data[CONF_ID],
+        data[CONF_DEP_NUM],
+        time_before=walking_offset_timedelta
+    )  # type: ignore[Any]
 
     title: str = reply["stops"][0]["stop_name"] + " " + (reply["stops"][0]["platform_code"] or "")
     if data[CONF_DEP_NUM] == 0:
@@ -61,6 +76,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Optional(CONF_CAL_EVENTS_NUM, default=20): vol.All(
                 vol.Coerce(int),
                 vol.Range(0, 1000),
+            ),
+            vol.Optional(CONF_WALKING_OFFSET, default=0): vol.All(
+                vol.Coerce(int),
+                vol.Range(-30, 4320),
             ),
         }
 

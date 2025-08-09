@@ -8,11 +8,13 @@
           "stop_selector": "Vyber zastávku",
           "api_key": "Vlož API klíč",
           "departures_number": "Vyber počet odjezdů k zobrazení",
-          "cal_events_count": "Počet kalendářních událostí odjezdů"
+          "cal_events_count": "Počet kalendářních událostí odjezdů",
+          "walking_offset": "Časový posun pro chůzi (minuty)"
         },
         "data_description": {
           "stop_selector": "Začni psát k hledání",
-          "api_key": "API klíč pro Golemio API"
+          "api_key": "API klíč pro Golemio API",
+          "walking_offset": "Posun pro kompenzaci vzdálenosti chůze k zastávce (kladné = zobrazí budoucí odjezdy, záporné = zobrazí minulé odjezdy)"
         }
       }
     },

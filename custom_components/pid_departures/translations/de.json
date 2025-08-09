@@ -8,11 +8,13 @@
           "stop_selector": "Haltestelle auswählen",
           "api_key": "API-Schlüssel eingeben",
           "departures_number": "Anzahl der anzuzeigenden Abfahrten",
-          "cal_events_number": "Anzahl der Kalendertermine für zu erstellende Abfahrten"
+          "cal_events_number": "Anzahl der Kalendertermine für zu erstellende Abfahrten",
+          "walking_offset": "Gehzeit-Versatz (Minuten)"
         },
         "data_description": {
           "stop_selector": "Tipp - tippen Sie zum Suchen",
-          "api_key": "API-Schlüssel für Golemio API"
+          "api_key": "API-Schlüssel für Golemio API",
+          "walking_offset": "Versatz zur Kompensation der Gehstrecke zur Haltestelle (positiv = zukünftige Abfahrten anzeigen, negativ = vergangene Abfahrten anzeigen)"
         }
       }
     },
@@ -252,4 +254,3 @@
     }
   }
 }
-

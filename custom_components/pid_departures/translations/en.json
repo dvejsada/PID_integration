@@ -8,11 +8,13 @@
           "stop_selector": "Select the stop",
           "api_key": "Enter API key",
           "departures_number": "Number of departures to display",
-          "cal_events_number": "Number of calendar events for departures to be created"
+          "cal_events_number": "Number of calendar events for departures to be created",
+          "walking_offset": "Walking time offset (minutes)"
         },
         "data_description": {
           "stop_selector": "Hint - type to search",
-          "api_key": "API key for Golemio API"
+          "api_key": "API key for Golemio API",
+          "walking_offset": "Offset to compensate for walking distance to stop (positive = show future departures, negative = show past departures)"
         }
       }
     },

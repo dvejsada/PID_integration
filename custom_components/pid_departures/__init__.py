@@ -4,8 +4,10 @@ from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DOMAIN, CONF_DEP_NUM
+from .const import DOMAIN, CONF_DEP_NUM, CONF_WALKING_OFFSET
+from .errors import CannotConnect, StopNotFound, WrongApiKey
 from .hub import DepartureBoard
 
 PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
@@ -13,7 +15,14 @@ PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Departure Board from a config entry flow."""
-    hub = DepartureBoard(hass, entry.data[CONF_API_KEY], entry.data[CONF_ID], entry.data[CONF_DEP_NUM])  # type: ignore[Any]
+    walking_offset = entry.data.get(CONF_WALKING_OFFSET, 0)
+    hub = DepartureBoard(
+        hass,
+        entry.data[CONF_API_KEY],
+        entry.data[CONF_ID],
+        entry.data[CONF_DEP_NUM],
+        walking_offset
+    )  # type: ignore[Any]
     try:
         await hub.async_update()
     except CannotConnect:
