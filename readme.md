@@ -37,6 +37,12 @@ It is only required to fill in API key once - for additional departure boards it
 
 The success dialog will appear or an error will be displayed in the popup.
 
+### Changing options
+
+The number of departures, number of calendar events, and the walking-time offset can be changed at any time via the **Configure** button on the integration entry — there is no need to delete and re-add the board.
+
+If your Golemio API key stops working (e.g. it expired), Home Assistant will prompt you to re-authenticate; just enter a new key and the board reloads automatically.
+
 ## Dashboard
 
 The repo includes example card based on [Flex-table-card](https://github.com/custom-cards/flex-table-card) for display on dashboard.

@@ -4,70 +4,56 @@ from __future__ import annotations
 from collections.abc import Mapping
 from datetime import datetime, timedelta
 import logging
-from typing import Any, cast
+from typing import Any
 from typing_extensions import override
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, STATE_ON
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt
 
-from .const import CAL_EVENT_MIN_DURATION_SEC, CONF_CAL_EVENTS_NUM, DOMAIN, ICON_STOP, ROUTE_TYPE_ICON, RouteType
+from .const import CAL_EVENT_MIN_DURATION_SEC, ICON_STOP, ROUTE_TYPE_ICON, RouteType
+from .coordinator import PIDConfigEntry, PIDDepartureUpdateCoordinator
 from .dep_board_api import PIDDepartureBoardAPI
 from .entity import BaseEntity
-from .hub import DepartureBoard, DepartureData
+from .hub import DepartureData
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: PIDConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    departure_board: DepartureBoard = hass.data[DOMAIN][config_entry.entry_id]  # type: ignore[Any]
-    events_count: int = config_entry.data[CONF_CAL_EVENTS_NUM]  # type: ignore[Any]
+    coordinator = config_entry.runtime_data
     async_add_entities([
-        DeparturesCalendarEntity(departure_board, events_count=events_count),
+        DeparturesCalendarEntity(coordinator, events_count=coordinator.cal_events_count),
     ])
 
 
 class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
 
-    _attr_should_poll = False
     _attr_translation_key = "departures"
 
-    def __init__(self, departure_board: DepartureBoard, events_count: int) -> None:
-        super().__init__(departure_board)
+    def __init__(self, coordinator: PIDDepartureUpdateCoordinator, events_count: int) -> None:
+        super().__init__(coordinator)
         self._events_count = events_count
         self._event: CalendarEvent | None = None
-
-    @override
-    async def async_added_to_hass(self):
-        """Run when this Entity has been added to HA."""
-        # Sensors should also register callbacks to HA when their state changes
-        self._departure_board.register_callback(self.async_write_ha_state)
-
-    @override
-    async def async_will_remove_from_hass(self):
-        """Entity being removed from hass."""
-        # The opposite of async_added_to_hass. Remove any registered call backs here.
-        self._departure_board.remove_callback(self.async_write_ha_state)
 
     @property
     @override
     def event(self) -> CalendarEvent | None:
         """Return the current or next upcoming event."""
-        return self._create_event(self._departure_board.departures[0])
+        return self._create_event(self.coordinator.departures[0])
 
     @property
     @override
     def icon(self) -> str:
         """Return entity icon based on the type of route."""
         if self.state == STATE_ON:
-            route_type = self._departure_board.departures[0].route_type
+            route_type = self.coordinator.departures[0].route_type
             return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
         else:
             return ICON_STOP
@@ -78,9 +64,9 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
         # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
         #  the entity on the map.
         return {
-            **self._departure_board.departures[0].as_dict(),
-            CONF_LATITUDE: self._departure_board.latitude,
-            CONF_LONGITUDE: self._departure_board.longitude,
+            **self.coordinator.departures[0].as_dict(),
+            CONF_LATITUDE: self.coordinator.latitude,
+            CONF_LONGITUDE: self.coordinator.longitude,
         }
 
     @override
@@ -97,17 +83,12 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
             _LOGGER.debug(f"async_get_events: start_date={start_date} end_date={end_date} is out of range")
             return []
 
-        data = await PIDDepartureBoardAPI.async_fetch_data(
-            self._departure_board.api_key,
-            self._departure_board.board_id,
+        departures = await self.coordinator.async_get_departures(
             limit=self._events_count,
             time_before=timedelta_clamp(time_before, *PIDDepartureBoardAPI.TIME_BEFORE_RANGE),
             time_after=timedelta_clamp(time_after, *PIDDepartureBoardAPI.TIME_AFTER_RANGE))
 
-        events = (
-            self._create_event(DepartureData.from_api(dep))
-            for dep in cast(list[dict[str, Any]], data["departures"])
-        )
+        events = (self._create_event(dep) for dep in departures)
         return [event for event in events if event]
 
     def _create_event(self, departure: DepartureData) -> CalendarEvent | None:
@@ -132,7 +113,7 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
             start=start,
             end=end,
             summary=f"{route_type} {short_name}",
-            location=self._departure_board.name,
+            location=self.coordinator.name,
             description=f"Trip to {departure.trip_headsign}",
         )
 
