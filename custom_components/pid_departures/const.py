@@ -2,6 +2,7 @@
 Defining constants for the project.
 """
 from aiohttp import ClientTimeout
+from datetime import timedelta
 from enum import StrEnum, auto
 from typing import Final
 
@@ -19,6 +20,7 @@ class RouteType(StrEnum):
 
 API_URL = "https://api.golemio.cz/v2/pid/departureboards"
 HTTP_TIMEOUT: Final = ClientTimeout(total=10)
+SCAN_INTERVAL: Final = timedelta(seconds=60)
 
 ICON_STOP = "mdi:bus-stop-uncovered"
 ICON_WHEEL = "mdi:wheelchair"

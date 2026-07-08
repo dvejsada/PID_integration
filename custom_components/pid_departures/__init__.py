@@ -1,51 +1,30 @@
 """Prague Departure Board integration."""
 from __future__ import annotations
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DOMAIN, CONF_DEP_NUM, CONF_WALKING_OFFSET
-from .errors import CannotConnect, StopNotFound, WrongApiKey
-from .hub import DepartureBoard
+from .coordinator import PIDConfigEntry, PIDDepartureUpdateCoordinator
 
 PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Departure Board from a config entry flow."""
-    walking_offset = entry.data.get(CONF_WALKING_OFFSET, 0)
-    hub = DepartureBoard(
-        hass,
-        entry.data[CONF_API_KEY],
-        entry.data[CONF_ID],
-        entry.data[CONF_DEP_NUM],
-        walking_offset
-    )  # type: ignore[Any]
-    try:
-        await hub.async_update()
-    except CannotConnect:
-        # try again later again
-        raise ConfigEntryNotReady from None
-    except StopNotFound:
-        return False
-    except WrongApiKey:
-        return False
+async def async_setup_entry(hass: HomeAssistant, entry: PIDConfigEntry) -> bool:
+    """Set up Departure Board from a config entry."""
+    coordinator = PIDDepartureUpdateCoordinator(hass, entry)
+    await coordinator.async_config_entry_first_refresh()
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = hub  # type: ignore[Any]
+    entry.runtime_data = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: PIDConfigEntry) -> bool:
     """Unload a config entry."""
-    # This is called when an entry/configured device is to be removed. The class
-    # needs to unload itself, and remove callbacks. See the classes for further
-    # details
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)  # type: ignore[Any]
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
-    return unload_ok
+
+async def _async_update_listener(hass: HomeAssistant, entry: PIDConfigEntry) -> None:
+    """Reload the entry when its options are updated."""
+    await hass.config_entries.async_reload(entry.entry_id)
