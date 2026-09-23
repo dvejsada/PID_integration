@@ -5,12 +5,23 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, CONF_DEP_NUM, CONF_WALKING_OFFSET
 from .errors import CannotConnect, StopNotFound, WrongApiKey
+from .frontend import async_register_card
 from .hub import DepartureBoard
 
 PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the integration, runs once regardless of the number of departure boards."""
+    await async_register_card(hass)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
