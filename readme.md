@@ -72,6 +72,7 @@ How to read the card:
 - The time below the countdown is the scheduled departure, the badge next to it the delay in minutes (orange up to 4 minutes, red from 5). The calendar icon means there are no real-time data for the trip and the timetable is shown.
 - A cloud icon with a time in the header means the data have not been updated for more than 3 minutes (e.g. the API is down).
 - Tapping a departure opens its details with all attributes.
+- All values sit in fixed columns, so a delay, a cancellation or a long label never shifts the other rows. The layout adapts to the card width: one line per departure on wide cards, the time moves under the countdown on medium ones, and on narrow ones the destination gets its own line.
 
 The line colours follow the PID colours and can be changed with a theme, e.g. `pid-color-tram: "#a00000"`. Available variables: `pid-color-tram`, `pid-color-bus`, `pid-color-trolleybus`, `pid-color-train`, `pid-color-ferry`, `pid-color-funicular`, `pid-color-night`, `pid-color-metro-a`, `pid-color-metro-b`, `pid-color-metro-c`.
 

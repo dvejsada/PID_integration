@@ -391,6 +391,7 @@ class PidDeparturesCard extends HTMLElement {
     const now = Date.now();
     const config = this._config;
 
+    const columns = this._columns();
     let body;
     if (!config.devices.length) {
       body = `<div class="message">${escapeHtml(t.no_board)}</div>`;
@@ -398,9 +399,8 @@ class PidDeparturesCard extends HTMLElement {
       body = `<div class="message warning">${escapeHtml(t.board_not_found)}</div>`;
     } else {
       const departures = this._departures(now);
-      const showPlatform = config.show_platform ?? this._boards.length > 1;
       body = departures.length
-        ? departures.map((d) => this._renderRow(d, now, t, fmt, showPlatform)).join("")
+        ? departures.map((d) => this._renderRow(d, now, t, fmt, columns)).join("")
         : `<div class="message">${escapeHtml(t.no_departures)}</div>`;
     }
 
@@ -410,12 +410,32 @@ class PidDeparturesCard extends HTMLElement {
       this._card = document.createElement("ha-card");
       this.shadowRoot.append(style, this._card);
     }
+
     this._card.classList.toggle("compact", config.compact);
+
+    // Re-rendering replaces the rows, keep keyboard focus on the same departure.
+    const focused = this.shadowRoot.activeElement?.dataset?.entity;
+
+    // Every row is a subgrid of this grid, so a column has the same width in all
+    // rows: a delay badge or a long label never shifts the neighbouring rows.
+    const departuresClass = columns.includes("count")
+      ? (columns.includes("time") ? "stackable" : "")
+      : "no-count";
+    const template = columns
+      .map((c) => `[${c}] ${c === "main" ? "minmax(0, 1fr)" : "max-content"}`)
+      .join(" ");
     this._card.innerHTML = `
       ${config.show_header ? this._renderHeader(now, t, fmt) : ""}
       ${config.show_infotext ? this._renderInfotext() : ""}
-      <div class="departures">${body}</div>
+      <div class="content">
+        <div class="departures ${departuresClass}"
+             style="grid-template-columns: ${template} [end]">${body}</div>
+      </div>
     `;
+
+    if (focused) {
+      this._card.querySelector(`.row[data-entity="${CSS.escape(focused)}"]`)?.focus();
+    }
 
     this._card.querySelectorAll(".row").forEach((row) => {
       row.addEventListener("click", () => this._moreInfo(row.dataset.entity));
@@ -430,6 +450,17 @@ class PidDeparturesCard extends HTMLElement {
       this._infoExpanded = !this._infoExpanded;
       this._render();
     });
+  }
+
+  /** Grid columns of the departure list, in display order. */
+  _columns() {
+    const config = this._config;
+    const columns = ["line", "main"];
+    if (config.show_platform ?? this._boards.length > 1) columns.push("platform");
+    if (config.time_format !== "relative") columns.push("time");
+    if (config.show_delay) columns.push("delay");
+    if (config.time_format !== "absolute") columns.push("count");
+    return columns;
   }
 
   _renderHeader(now, t, fmt) {
@@ -475,56 +506,38 @@ class PidDeparturesCard extends HTMLElement {
       </div>`;
   }
 
-  _renderRow(d, now, t, fmt, showPlatform) {
+  _renderRow(d, now, t, fmt, columns) {
     const a = d.attrs;
-    const config = this._config;
     const diffMs = d.estimated - now;
     const minutes = Math.floor(diffMs / 60000);
     const realtime = a.is_delay_avail === true;
     const delayMin = realtime ? Math.floor((a.delay_sec ?? 0) / 60) : 0;
+    const time = fmt.format(d.scheduled);
+    const typeLabel = t.route_type[a.route_type] || "";
 
     // Countdown, rounded down so the user is never told they have more time than they do.
     let countdown;
-    if (a.is_at_stop) countdown = t.at_stop;
+    if (a.is_canceled) countdown = t.canceled;
+    else if (a.is_at_stop) countdown = t.at_stop;
     else if (diffMs <= 0) countdown = t.now;
-    else if (minutes < 1) countdown = `&lt;1 ${t.min}`;
-    else countdown = `${minutes} ${t.min}`;
+    else if (minutes < 1) countdown = `<1 ${t.min}`;
+    else if (minutes < 60) countdown = `${minutes} ${t.min}`;
+    // A countdown in hours is harder to read than the time itself; the time
+    // column already shows it, otherwise show when it actually leaves.
+    else countdown = columns.includes("time") ? "" : fmt.format(d.estimated);
 
     // Scheduled time plus delay, the convention used on PID departure boards.
-    const time = fmt.format(d.scheduled);
     let delay = "";
-    if (config.show_delay && realtime && delayMin !== 0) {
-      const severity = delayMin >= 5 ? "severe" : delayMin > 0 ? "late" : "early";
-      delay = `<span class="delay ${severity}" title="${escapeHtml(t.delay)}">${delayMin > 0 ? "+" : "−"}${Math.abs(delayMin)}</span>`;
-    }
-    const noRealtime = config.show_delay && !realtime
-      ? `<ha-icon class="no-realtime" icon="mdi:calendar-clock" title="${escapeHtml(t.no_realtime)}"></ha-icon>`
-      : "";
-
-    let primary;
-    let secondary;
     if (a.is_canceled) {
-      primary = `<span class="canceled-label">${escapeHtml(t.canceled)}</span>`;
-      secondary = time;
-    } else if (config.time_format === "absolute") {
-      primary = `${time}${delay}`;
-      secondary = noRealtime;
-    } else if (config.time_format === "relative") {
-      primary = countdown;
-      secondary = `${noRealtime}${delay}`;
-    } else if (minutes >= 60 && !a.is_at_stop) {
-      // A countdown in hours is harder to read than the time itself.
-      primary = time;
-      secondary = `${noRealtime}${delay}`;
-    } else {
-      primary = countdown;
-      secondary = `${noRealtime}${time}${delay}`;
+      delay = "";
+    } else if (!realtime) {
+      delay = `<ha-icon icon="mdi:calendar-clock" title="${escapeHtml(t.no_realtime)}"></ha-icon>`;
+    } else if (delayMin !== 0) {
+      const severity = delayMin >= 5 ? "severe" : delayMin > 0 ? "late" : "early";
+      delay = `<span class="badge ${severity}" title="${escapeHtml(t.delay)}">${delayMin > 0 ? "+" : "−"}${Math.abs(delayMin)}</span>`;
     }
 
-    const typeLabel = t.route_type[a.route_type] || "";
     const features = [
-      showPlatform && a.stop_platform
-        ? `<span class="platform" title="${escapeHtml(t.platform)}">${escapeHtml(a.stop_platform)}</span>` : "",
       a.route_type === "train" && a.train_number ? `<span>${escapeHtml(a.train_number)}</span>` : "",
       a.is_wheelchair_accessible ? `<ha-icon icon="mdi:wheelchair-accessibility" title="${escapeHtml(t.wheelchair)}"></ha-icon>` : "",
       a.is_air_conditioned ? `<ha-icon icon="mdi:snowflake" title="${escapeHtml(t.air_conditioned)}"></ha-icon>` : "",
@@ -532,20 +545,26 @@ class PidDeparturesCard extends HTMLElement {
       a.is_substitute ? `<ha-icon icon="mdi:swap-horizontal-bold" title="${escapeHtml(t.substitute)}"></ha-icon>` : "",
     ].filter(Boolean).join("");
 
+    const cells = {
+      line: `<span class="line line--${lineClass(a)}" title="${escapeHtml(typeLabel)}">${escapeHtml(a.route_name || "?")}</span>`,
+      main: `
+        <div class="headsign">${escapeHtml(a.trip_headsign)}</div>
+        ${features ? `<div class="features">${features}</div>` : ""}`,
+      platform: a.stop_platform
+        ? `<span class="platform" title="${escapeHtml(t.platform)}">${escapeHtml(a.stop_platform)}</span>` : "",
+      time: escapeHtml(time),
+      delay,
+      count: escapeHtml(countdown),
+    };
+
     const soon = !a.is_canceled && (a.is_at_stop || diffMs < 2 * 60000);
+    const label = [typeLabel, a.route_name, a.trip_headsign, a.stop_platform && `${t.platform} ${a.stop_platform}`,
+      time, countdown].filter(Boolean).join(", ");
 
     return `
       <div class="row ${a.is_canceled ? "canceled" : ""} ${soon ? "soon" : ""}"
-           data-entity="${escapeHtml(d.entityId)}" role="button" tabindex="0">
-        <span class="line line--${lineClass(a)}" title="${escapeHtml(typeLabel)}">${escapeHtml(a.route_name || "?")}</span>
-        <div class="main">
-          <div class="headsign">${escapeHtml(a.trip_headsign)}</div>
-          ${features ? `<div class="features">${features}</div>` : ""}
-        </div>
-        <div class="when">
-          <div class="primary">${primary}</div>
-          ${secondary ? `<div class="secondary">${secondary}</div>` : ""}
-        </div>
+           data-entity="${escapeHtml(d.entityId)}" role="button" tabindex="0" aria-label="${escapeHtml(label)}">
+        ${columns.map((c) => `<div class="cell ${c}-cell">${cells[c]}</div>`).join("")}
       </div>`;
   }
 
@@ -603,24 +622,53 @@ const STYLES = `
     overflow: hidden;
   }
   .infotext.expanded .infotext-text { display: block; }
-  .departures { padding: 0 8px 8px; }
-  ha-card > .departures:first-child { padding-top: 8px; }
+  .content {
+    /* Lets the rows adapt to the width of the card, not of the window. */
+    container-type: inline-size;
+    padding: 0 8px 8px;
+  }
+  ha-card > .content:first-child { padding-top: 8px; }
+  .departures {
+    display: grid;
+    column-gap: 10px;
+    font-variant-numeric: tabular-nums;
+  }
   .row {
-    display: flex;
+    grid-column: 1 / -1;
+    display: grid;
+    /* Fallback for browsers without subgrid: same layout, columns sized per row. */
+    grid-template-columns: inherit;
+    grid-template-columns: subgrid;
+    column-gap: inherit;
     align-items: center;
-    gap: 12px;
-    min-height: 48px;
+    min-height: 52px;
     padding: 6px 8px;
+    box-sizing: border-box;
     border-radius: 8px;
     cursor: pointer;
     outline: none;
   }
   .row:hover, .row:focus-visible { background: var(--secondary-background-color); }
   .row + .row { border-top: 1px solid var(--divider-color); }
+  .cell { min-width: 0; }
+  .line-cell { grid-column: line; display: flex; }
+  .main-cell { grid-column: main; }
+  .platform-cell { grid-column: platform; text-align: center; }
+  .time-cell { grid-column: time; text-align: end; }
+  .delay-cell { grid-column: delay; display: flex; justify-content: center; }
+  .count-cell { grid-column: count; text-align: end; }
+
+  /* Reserved widths, so a column does not jump when its widest value changes
+     between updates (e.g. the first delay appears or "9 min" becomes "12 min"). */
+  .platform-cell { min-width: 2em; }
+  .delay-cell { min-width: 2.25em; }
+  .count-cell { min-width: 3.75em; }
+
   .line {
-    flex: none;
+    flex: 1;
     box-sizing: border-box;
-    min-width: 44px;
+    min-width: 2.75em;
+    max-width: 5em;
     padding: 4px 6px;
     border-radius: 6px;
     text-align: center;
@@ -629,7 +677,9 @@ const STYLES = `
     line-height: 1.2;
     color: #fff;
     background: var(--pid-line-bg);
-    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   /* Approximation of the PID line colours, a theme can override them. */
   .line--tram { --pid-line-bg: var(--pid-color-tram, #7a0603); }
@@ -646,7 +696,6 @@ const STYLES = `
     --pid-line-bg: var(--pid-color-night, #1d1d1b);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
   }
-  .main { flex: 1; min-width: 0; }
   .headsign {
     font-size: 15px;
     font-weight: 500;
@@ -662,66 +711,104 @@ const STYLES = `
     margin-top: 2px;
     color: var(--secondary-text-color);
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
     --mdc-icon-size: 16px;
   }
   .platform {
-    padding: 0 5px;
+    display: inline-block;
+    min-width: 1.2em;
+    padding: 0 4px;
     border: 1px solid var(--divider-color);
     border-radius: 4px;
+    font-size: 12px;
     font-weight: 600;
+    color: var(--secondary-text-color);
   }
-  .when {
-    flex: none;
-    text-align: end;
-    font-variant-numeric: tabular-nums;
+  .time-cell {
+    font-size: 13px;
+    color: var(--secondary-text-color);
+    white-space: nowrap;
   }
-  .primary {
+  .count-cell {
     font-size: 16px;
     font-weight: 600;
     color: var(--primary-text-color);
     white-space: nowrap;
   }
-  .soon .primary { color: var(--primary-color); }
-  .secondary {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 4px;
-    margin-top: 2px;
-    font-size: 12px;
-    color: var(--secondary-text-color);
-    white-space: nowrap;
-    --mdc-icon-size: 14px;
+  /* Without a countdown the time is the main information. */
+  .no-count .time-cell {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-text-color);
   }
-  .delay {
-    margin-inline-start: 4px;
-    padding: 0 4px;
+  .soon .count-cell { color: var(--primary-color); }
+  .delay-cell { color: var(--secondary-text-color); --mdc-icon-size: 16px; }
+  .badge {
+    box-sizing: border-box;
+    min-width: 2em;
+    padding: 1px 4px;
     border-radius: 4px;
+    text-align: center;
     font-size: 12px;
     font-weight: 700;
-    color: #fff;
+    line-height: 1.3;
   }
-  .delay.early { background: var(--info-color, #039be5); }
-  .delay.late { background: var(--warning-color, #ffa600); }
-  .delay.severe { background: var(--error-color, #db4437); }
-  .canceled .headsign, .canceled .secondary { text-decoration: line-through; }
-  .canceled .line, .canceled .main { opacity: 0.5; }
-  .canceled-label { color: var(--error-color); }
+  .badge.early { background: var(--info-color, #039be5); color: #fff; }
+  .badge.late { background: var(--warning-color, #ffa600); color: #1d1d1b; }
+  .badge.severe { background: var(--error-color, #db4437); color: #fff; }
+  .canceled .headsign, .canceled .time-cell { text-decoration: line-through; }
+  .canceled .line-cell, .canceled .main-cell, .canceled .platform-cell { opacity: 0.5; }
+  .canceled .count-cell { color: var(--error-color); }
   .message {
+    grid-column: 1 / -1;
     padding: 16px 8px;
     color: var(--secondary-text-color);
     text-align: center;
   }
   .message.warning { color: var(--warning-color); }
 
-  /* Compact: one line per departure, for wall tablets and small tiles. */
-  .compact .row { min-height: 36px; padding: 2px 8px; }
+  @supports not (grid-template-columns: subgrid) {
+    /* Without subgrid each row sizes its own columns, fix the widest ones instead. */
+    .line-cell { width: 3.25em; }
+    .time-cell { min-width: 3.25em; }
+  }
+
+  /* Medium cards: the time and delay move under the countdown, in their columns. */
+  @container (max-width: 419px) {
+    .stackable .row { grid-template-rows: auto auto; row-gap: 2px; }
+    .stackable .line-cell, .stackable .main-cell, .stackable .platform-cell { grid-row: 1 / span 2; }
+    .stackable .count-cell { grid-row: 1; grid-column: time / end; }
+    .stackable .time-cell, .stackable .delay-cell { grid-row: 2; }
+    .stackable .time-cell { font-size: 12px; }
+  }
+
+  /* Narrow cards: the destination gets the whole first line, the values the second. */
+  @container (max-width: 339px) {
+    .departures { column-gap: 8px; }
+    .departures .row { grid-template-rows: auto auto; row-gap: 2px; }
+    .departures .line-cell { grid-row: 1 / span 2; }
+    .departures .main-cell { grid-row: 1; grid-column: main / end; }
+    .departures .features { display: none; }
+    .departures .platform-cell, .departures .time-cell,
+    .departures .delay-cell, .departures .count-cell { grid-row: 2; }
+    .departures .count-cell { grid-column: count; }
+  }
+
+  /* Compact: one line per departure, for wall panels and small tiles. */
+  .compact .row { min-height: 36px; padding: 2px 8px; grid-template-rows: auto; row-gap: 0; }
   .compact .features { display: none; }
-  .compact .line { min-width: 38px; padding: 2px 4px; font-size: 14px; }
-  .compact .when { display: flex; align-items: center; gap: 8px; flex-direction: row-reverse; }
-  .compact .secondary { margin: 0; }
+  .compact .line { min-width: 2.5em; padding: 2px 4px; font-size: 14px; }
+  .compact .cell { grid-row: 1; }
+  .compact .main-cell { grid-column: main; }
+  .compact .time-cell { grid-column: time; font-size: 13px; }
+  .compact .count-cell { grid-column: count; }
   .compact .header { padding: 12px 16px 4px; }
   .compact .title { font-size: 18px; }
+  @container (max-width: 339px) {
+    /* One line has no room for both, the countdown matters more. */
+    .compact .stackable .time-cell { display: none; }
+  }
 `;
 
 class PidDeparturesCardEditor extends HTMLElement {
