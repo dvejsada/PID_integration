@@ -20,13 +20,14 @@ class PIDDepartureBoardAPI:
 
     @staticmethod
     async def async_fetch_data(
+        session: aiohttp.ClientSession,
         api_key: str,
         stop_id: str,
         limit: int = 1,
         time_before: timedelta = DEFAULT_TIME_BEFORE,
         time_after: timedelta = DEFAULT_TIME_AFTER,
     ) -> dict[str, Any]:
-        """Get new data from API."""
+        """Get new data from API using Home Assistant's shared client session."""
         headers = {"Content-Type": "application/json; charset=utf-8", "x-access-token": api_key}
         parameters = {
             "aswIds": stop_id,
@@ -36,24 +37,27 @@ class PIDDepartureBoardAPI:
         }
 
         _LOGGER.debug(f"GET {API_URL}?{urlencode(parameters)}")
-        async with (
-            aiohttp.ClientSession(raise_for_status=False, timeout=HTTP_TIMEOUT) as http,
-            http.get(API_URL, params=parameters, headers=headers) as resp
-        ):
-            if _LOGGER.isEnabledFor(logging.DEBUG):
-                body = await resp.text()
-                _LOGGER.debug(f"Received response for GET {API_URL}: HTTP {resp.status}\n" +
-                              ellipsis(body, 1024))
-            if resp.status == 200:
-                data: dict[str, Any] = await resp.json()
-                return data
-            elif resp.status == 401:
-                raise WrongApiKey
-            elif resp.status == 404:
-                raise StopNotFound
-            else:
-                _LOGGER.error(f"GET {resp.url} returned HTTP {resp.status}")
-                raise CannotConnect
+        try:
+            async with session.get(
+                API_URL, params=parameters, headers=headers, timeout=HTTP_TIMEOUT
+            ) as resp:
+                if _LOGGER.isEnabledFor(logging.DEBUG):
+                    body = await resp.text()
+                    _LOGGER.debug(f"Received response for GET {API_URL}: HTTP {resp.status}\n" +
+                                  ellipsis(body, 1024))
+                if resp.status == 200:
+                    data: dict[str, Any] = await resp.json()
+                    return data
+                elif resp.status == 401:
+                    raise WrongApiKey
+                elif resp.status == 404:
+                    raise StopNotFound
+                else:
+                    _LOGGER.error(f"GET {resp.url} returned HTTP {resp.status}")
+                    raise CannotConnect
+        except (aiohttp.ClientError, TimeoutError) as err:
+            _LOGGER.error(f"Error fetching data from {API_URL}: {err}")
+            raise CannotConnect from err
 
 
 def ellipsis(text: str, maxlen: int) -> str:

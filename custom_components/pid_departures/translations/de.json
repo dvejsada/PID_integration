@@ -16,6 +16,13 @@
           "api_key": "API-Schlüssel für Golemio API",
           "walking_offset": "Versatz zur Kompensation der Gehstrecke zur Haltestelle (positiv = zukünftige Abfahrten anzeigen, negativ = vergangene Abfahrten anzeigen)"
         }
+      },
+      "reauth_confirm": {
+        "title": "API-Schlüssel aktualisieren",
+        "description": "Der API-Schlüssel für die Golemio API ist nicht mehr gültig. Geben Sie einen neuen ein.",
+        "data": {
+          "api_key": "API-Schlüssel eingeben"
+        }
       }
     },
     "error": {
@@ -23,7 +30,28 @@
       "stop_not_in_list": "Haltestelle wurde nicht in der Liste gefunden - wählen Sie nur eine Haltestelle aus der bereitgestellten Liste.",
       "stop_not_found": "Haltestelle mit den angegebenen awsIDs wurde nicht gefunden.",
       "no_departures_selected": "Anzahl der Abfahrten darf nicht 0 sein.",
-      "wrong_api_key": "Verbindung wurde nicht autorisiert. Falscher oder kein API-Schlüssel angegeben."
+      "wrong_api_key": "Verbindung wurde nicht autorisiert. Falscher oder kein API-Schlüssel angegeben.",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "abort": {
+      "already_configured": "Diese Abfahrtstafel ist bereits konfiguriert.",
+      "reauth_successful": "Die erneute Authentifizierung war erfolgreich."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen der Abfahrtstafel",
+        "description": "Ändern Sie die Anzeigeoptionen für diese Abfahrtstafel.",
+        "data": {
+          "departures_number": "Anzahl der anzuzeigenden Abfahrten",
+          "cal_events_number": "Anzahl der Kalendertermine für zu erstellende Abfahrten",
+          "walking_offset": "Gehzeit-Versatz (Minuten)"
+        },
+        "data_description": {
+          "walking_offset": "Versatz zur Kompensation der Gehstrecke zur Haltestelle (positiv = zukünftige Abfahrten anzeigen, negativ = vergangene Abfahrten anzeigen)"
+        }
+      }
     }
   },
   "entity": {

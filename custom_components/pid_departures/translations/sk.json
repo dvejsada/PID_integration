@@ -16,6 +16,13 @@
           "api_key": "API kľúč pre Golemio API",
           "walking_offset": "Posun na kompenzáciu vzdialenosti chôdze k zastávke (kladné = zobrazí budúce odchody, záporné = zobrazí minulé odchody)"
         }
+      },
+      "reauth_confirm": {
+        "title": "Aktualizácia API kľúča",
+        "description": "API kľúč pre Golemio API už nie je platný. Zadajte nový.",
+        "data": {
+          "api_key": "Zadajte API kľúč"
+        }
       }
     },
     "error": {
@@ -23,7 +30,28 @@
       "stop_not_in_list": "Zastávka nebola nájdená v zozname - vyberte iba zastávku zo zobrazeného zoznamu.",
       "stop_not_found": "Zastávka s poskytnutými awsID nebola nájdená.",
       "no_departures_selected": "Počet odchodov nemôže byť 0.",
-      "wrong_api_key": "Pripojenie nebolo autorizované. Bol zadaný nesprávny alebo žiadny API kľúč."
+      "wrong_api_key": "Pripojenie nebolo autorizované. Bol zadaný nesprávny alebo žiadny API kľúč.",
+      "unknown": "Neočakávaná chyba"
+    },
+    "abort": {
+      "already_configured": "Táto odchodová tabuľa je už nakonfigurovaná.",
+      "reauth_successful": "Opätovné overenie bolo úspešné."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Možnosti odchodovej tabule",
+        "description": "Zmeňte možnosti zobrazenia tejto odchodovej tabule.",
+        "data": {
+          "departures_number": "Počet odchodov na zobrazenie",
+          "cal_events_number": "Počet kalendárnych udalostí pre odchody, ktoré sa majú vytvoriť",
+          "walking_offset": "Časový posun pre chôdzu (minúty)"
+        },
+        "data_description": {
+          "walking_offset": "Posun na kompenzáciu vzdialenosti chôdze k zastávke (kladné = zobrazí budúce odchody, záporné = zobrazí minulé odchody)"
+        }
+      }
     }
   },
   "entity": {

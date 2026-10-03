@@ -1,16 +1,11 @@
 from __future__ import annotations
 
 from attrs import asdict, converters, define, field, fields
-from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import reduce
-from typing import Any, cast
+from typing import Any
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
-
-from .const import DOMAIN, RouteType
-from .dep_board_api import PIDDepartureBoardAPI
+from .const import RouteType
 
 
 # Based on PID Departure Board schema in https://api.golemio.cz/pid/docs/openapi/.
@@ -73,126 +68,6 @@ class DepartureData:
     def as_dict(self) -> dict[str, Any]:
         """Return data as a dict."""
         return asdict(self)
-
-
-class DepartureBoard:
-    """Setting Departure board as device."""
-
-    def __init__(self, hass: HomeAssistant, api_key: str, stop_id: str, conn_num: int, walking_offset: int = 0) -> None:
-        """Initialize departure board."""
-        super().__init__()
-        self._hass = hass
-        self._api_key: str = api_key
-        self._stop_id: str = stop_id
-        self.conn_num: int = int(conn_num)
-        self.walking_offset: int = walking_offset  # User input in minutes (positive = future)
-        self.response: dict[str, Any] = {}
-        self._departures: list[DepartureData] = []
-        self._callbacks: set[Callable[[], None]] = set()
-
-    @property
-    def board_id(self) -> str:
-        """ID for departure board."""
-        return self._stop_id
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        """ Provides a device info. """
-        return {"identifiers": {(DOMAIN, self.board_id)}, "name": self.name, "manufacturer": "Prague Integrated Transport"}
-
-    @property
-    def name(self) -> str:
-        """Provides name for departure board."""
-        return self.stop_name + " " + self.platform
-
-    @property
-    def stop_name(self) -> str:
-        """ Provides name of the stop."""
-        return self.response["stops"][0]["stop_name"]  # type: ignore[Any]
-
-    @property
-    def platform(self) -> str:
-        """ Provides platform of the stop."""
-        if self.response["stops"][0]["platform_code"] is not None:
-            value: str = self.response["stops"][0]["platform_code"]
-        else:
-            value = ""
-        return value
-
-    @property
-    def departures(self) -> list[DepartureData]:
-        """Return a list of fetched departures from this stop sorted from earliest to latest."""
-        return self._departures
-
-    @property
-    def latitude(self) -> float:
-        """ Returns latitude of the stop."""
-        return self.response["stops"][0]["stop_lat"]  # type: ignore[Any]
-
-    @property
-    def longitude(self) -> float:
-        """Returns longitude of the stop."""
-        return self.response["stops"][0]["stop_lon"]  # type: ignore[Any]
-
-    @property
-    def api_key(self) -> str:
-        """ Returns API key."""
-        return self._api_key
-
-    async def async_update(self) -> None:
-        """ Updates the data from API."""
-        # Convert user-friendly walking offset to API format
-        # User: positive = future, negative = past (intuitive)
-        # API: positive = past, negative = future (counter-intuitive)
-        # So we invert the sign and convert minutes to timedelta
-        api_offset_minutes = -self.walking_offset
-        walking_offset_timedelta = timedelta(minutes=api_offset_minutes)
-
-        data = await PIDDepartureBoardAPI.async_fetch_data(
-            self.api_key,
-            self._stop_id,
-            self.conn_num,
-            time_before=walking_offset_timedelta
-        )
-        self.response = data
-        self._departures = [DepartureData.from_api(dep)
-                            for dep in cast(list[dict[str, Any]], data["departures"])]
-        await self.publish_updates()
-
-    def register_callback(self, callback: Callable[[], None]) -> None:
-        """Register callback, called when there are new data."""
-        self._callbacks.add(callback)
-
-    def remove_callback(self, callback: Callable[[], None]) -> None:
-        """Remove previously registered callback."""
-        self._callbacks.discard(callback)
-
-    async def publish_updates(self) -> None:
-        """Schedule call to all registered callbacks."""
-        for callback in self._callbacks:
-            callback()
-
-    @property
-    def wheelchair_accessible(self) -> int:
-        """Returns wheelchair accessibility of the stop."""
-        return int(self.response["stops"][0]["wheelchair_boarding"])  # type: ignore[Any]
-
-    @property
-    def zone(self) -> str:
-        """Zone of the stop"""
-        return self.response["stops"][0]["zone_id"]  # type: ignore[Any]
-
-    @property
-    def info_text(self) -> tuple[bool, dict[str, Any]]:
-        """ State and content of info text"""
-        if len(self.response["infotexts"]) != 0:  # type: ignore[Any]
-            state = True
-            text: dict[str, Any] = self.response["infotexts"][0]
-        else:
-            state = False
-            text = {}
-
-        return state, text
 
 
 def dig(d: dict[str, Any], keypath: list[str]) -> Any:  # type: ignore[Any]
