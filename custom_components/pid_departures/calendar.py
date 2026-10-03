@@ -46,15 +46,16 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
     @override
     def event(self) -> CalendarEvent | None:
         """Return the current or next upcoming event."""
-        return self._create_event(self.coordinator.departures[0])
+        departure = self.coordinator.departure(0)
+        return self._create_event(departure) if departure else None
 
     @property
     @override
     def icon(self) -> str:
         """Return entity icon based on the type of route."""
-        if self.state == STATE_ON:
-            route_type = self.coordinator.departures[0].route_type
-            return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
+        departure = self.coordinator.departure(0)
+        if departure and self.state == STATE_ON:
+            return ROUTE_TYPE_ICON.get(departure.route_type, ROUTE_TYPE_ICON[RouteType.BUS])
         else:
             return ICON_STOP
 
@@ -63,8 +64,9 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
     def extra_state_attributes(self) -> Mapping[str, Any]:
         # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
         #  the entity on the map.
+        departure = self.coordinator.departure(0)
         return {
-            **self.coordinator.departures[0].as_dict(),
+            **(departure.as_dict() if departure else {}),
             CONF_LATITUDE: self.coordinator.latitude,
             CONF_LONGITUDE: self.coordinator.longitude,
         }
@@ -113,7 +115,7 @@ class DeparturesCalendarEntity(BaseEntity, CalendarEntity):
             start=start,
             end=end,
             summary=f"{route_type} {short_name}",
-            location=self.coordinator.name,
+            location=self.coordinator.board_name,
             description=f"Trip to {departure.trip_headsign}",
         )
 

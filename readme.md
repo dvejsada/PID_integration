@@ -10,6 +10,8 @@ Multiple departure boards can be configured.
 
 ## Installation
 
+Requires Home Assistant 2024.11 or newer.
+
 ### Using [HACS](https://hacs.xyz/)
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dvejsada&repository=PID_integration&category=Integration)
@@ -45,8 +47,18 @@ If your Golemio API key stops working (e.g. it expired), Home Assistant will pro
 
 ## Dashboard
 
-The repo includes example card based on [Flex-table-card](https://github.com/custom-cards/flex-table-card) for display on dashboard.
+### PID Departures Card
+
+For the dashboard there is a dedicated card in a separate repository, [PID Departures Card](https://github.com/dvejsada/PID_integration_cards). It shows a live departure board with countdowns, delays, cancellations and service alerts, can merge several platforms of a stop into one list, and is installed through HACS.
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dvejsada&repository=PID_integration_cards&category=plugin)
+
+![PID Departures Card](https://raw.githubusercontent.com/dvejsada/PID_integration_cards/main/assets/preview.png "PID Departures Card")
+
+### Flex-table-card
+
+The repo also includes an example card based on [Flex-table-card](https://github.com/custom-cards/flex-table-card) (`card.yaml`).
 
 Just modify the headline and the departure entity name - number in the name shall be replaced by * to include all departures.
 
-![card](assets/card.jpg "Card") 
+![card](assets/card.jpg "Card")

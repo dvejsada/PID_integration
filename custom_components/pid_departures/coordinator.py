@@ -139,8 +139,9 @@ class PIDDepartureUpdateCoordinator(DataUpdateCoordinator[BoardData]):
         """Stable ID for the departure board (the stop ASW ID)."""
         return self.stop_id
 
+    # Not `name`: DataUpdateCoordinator.__init__ assigns self.name.
     @property
-    def name(self) -> str:
+    def board_name(self) -> str:
         """Display name for the departure board."""
         return (self.data.stop_name + " " + self.data.platform).strip()
 
@@ -149,7 +150,7 @@ class PIDDepartureUpdateCoordinator(DataUpdateCoordinator[BoardData]):
         """Provide device info for the departure board."""
         return DeviceInfo(
             identifiers={(DOMAIN, self.board_id)},
-            name=self.name,
+            name=self.board_name,
             manufacturer="Prague Integrated Transport",
         )
 
@@ -157,6 +158,11 @@ class PIDDepartureUpdateCoordinator(DataUpdateCoordinator[BoardData]):
     def departures(self) -> list[DepartureData]:
         """Return the fetched departures, earliest first."""
         return self.data.departures
+
+    def departure(self, index: int) -> DepartureData | None:
+        """Return the departure at the index, None when the API returned fewer."""
+        departures = self.data.departures
+        return departures[index] if index < len(departures) else None
 
     @property
     def stop_name(self) -> str:

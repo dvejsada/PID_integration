@@ -14,6 +14,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import ICON_STOP, ICON_LAT, ICON_LON, ICON_ZONE, ICON_PLATFORM, ICON_UPDATE, ROUTE_TYPE_ICON, RouteType
 from .coordinator import PIDConfigEntry, PIDDepartureUpdateCoordinator
 from .entity import BaseEntity
+from .hub import DepartureData
 
 
 async def async_setup_entry(
@@ -43,45 +44,8 @@ async def async_setup_entry(
     async_add_entities(new_entities)
 
 
-class RouteNameSensor(BaseEntity, SensorEntity):
-    """Sensor for departure route name."""
-
-    _attr_translation_key = "route_name"
-
-    def __init__(self, coordinator: PIDDepartureUpdateCoordinator, departure_num: int) -> None:
-        super().__init__(coordinator)
-        self._departure = departure_num
-        self._attr_unique_id = f"{coordinator.board_id}_{self.translation_key}_{departure_num + 1}"
-        self._attr_translation_placeholders = {"num": str(departure_num + 1)}
-
-    @property
-    def native_value(self) -> str:
-        """ Returns name of the route as state."""
-        return self.coordinator.departures[self._departure].route_name or "?"
-
-    @property
-    def extra_state_attributes(self) -> Mapping[str, Any]:
-        """ Returns dictionary of additional state attributes"""
-        # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
-        #  the entity on the map.
-        return {
-            **self.coordinator.departures[self._departure].as_dict(),
-            CONF_LATITUDE: self.coordinator.latitude,
-            CONF_LONGITUDE: self.coordinator.longitude,
-        }
-
-    @property
-    def icon(self) -> str:
-        """Returns entity icon based on the type of route"""
-        route_type = self.coordinator.departures[self._departure].route_type
-        return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
-
-
-class DepartureTimeSensor(BaseEntity, SensorEntity):
-    """Sensor for the next departure time (estimated)."""
-
-    _attr_translation_key = "departure_time"
-    _attr_device_class = SensorDeviceClass.TIMESTAMP
+class DepartureEntity(BaseEntity):
+    """Base for entities showing the n-th departure of the board."""
 
     def __init__(self, coordinator: PIDDepartureUpdateCoordinator, departure_num: int) -> None:
         super().__init__(coordinator)
@@ -90,14 +54,58 @@ class DepartureTimeSensor(BaseEntity, SensorEntity):
         self._attr_translation_placeholders = {"num": str(departure_num + 1)}
 
     @property
-    def native_value(self) -> datetime | None:
-        return self.coordinator.departures[self._departure_num].departure_time_est
+    def _departure(self) -> DepartureData | None:
+        return self.coordinator.departure(self._departure_num)
+
+    @property
+    def available(self) -> bool:
+        """Unavailable while the API returns fewer departures than configured, e.g. at night."""
+        return super().available and self._departure is not None
 
     @property
     def icon(self) -> str:
         """Returns entity icon based on the type of route"""
-        route_type = self.coordinator.departures[self._departure_num].route_type
+        departure = self._departure
+        route_type = departure.route_type if departure else RouteType.BUS
         return ROUTE_TYPE_ICON.get(route_type, ROUTE_TYPE_ICON[RouteType.BUS])
+
+
+class RouteNameSensor(DepartureEntity, SensorEntity):
+    """Sensor for departure route name."""
+
+    _attr_translation_key = "route_name"
+
+    @property
+    def native_value(self) -> str | None:
+        """ Returns name of the route as state."""
+        departure = self._departure
+        return (departure.route_name or "?") if departure else None
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any]:
+        """ Returns dictionary of additional state attributes"""
+        departure = self._departure
+        if departure is None:
+            return {}
+        # NOTE: When CONF_LATITUDE and CONF_LONGITUDE is included, HASS shows
+        #  the entity on the map.
+        return {
+            **departure.as_dict(),
+            CONF_LATITUDE: self.coordinator.latitude,
+            CONF_LONGITUDE: self.coordinator.longitude,
+        }
+
+
+class DepartureTimeSensor(DepartureEntity, SensorEntity):
+    """Sensor for the next departure time (estimated)."""
+
+    _attr_translation_key = "departure_time"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    @property
+    def native_value(self) -> datetime | None:
+        departure = self._departure
+        return departure.departure_time_est if departure else None
 
 
 class StopSensor(BaseEntity, SensorEntity):
