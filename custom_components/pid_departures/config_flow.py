@@ -59,6 +59,7 @@ async def validate_api_key(hass: HomeAssistant, api_key: str, stop_id: str) -> N
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
+    MINOR_VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         # Check for any previous instance of the integration
