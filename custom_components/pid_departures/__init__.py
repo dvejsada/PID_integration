@@ -1,6 +1,8 @@
 """Prague Departure Board integration."""
 from __future__ import annotations
 
+import logging
+
 from homeassistant.const import CONF_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -8,7 +10,22 @@ from homeassistant.helpers import entity_registry as er
 from .const import DOMAIN
 from .coordinator import PIDConfigEntry, PIDDepartureUpdateCoordinator
 
+_LOGGER = logging.getLogger(__name__)
+
 PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: PIDConfigEntry) -> bool:
+    """Migrate entries created before version 3.0.0.
+
+    Older releases declared the config flow version as 0.1. The stored data is
+    unchanged since then, so only the version number needs to be raised.
+    """
+    _LOGGER.debug("Migrating entry %s from version %s", entry.title, entry.version)
+    if entry.version < 1:
+        hass.config_entries.async_update_entry(entry, version=1)
+    _LOGGER.debug("Migrated entry %s to version %s", entry.title, entry.version)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PIDConfigEntry) -> bool:
