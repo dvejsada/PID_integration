@@ -16,22 +16,41 @@ PLATFORMS: list[str] = ["sensor", "binary_sensor", "calendar"]
 
 
 async def async_migrate_entry(hass: HomeAssistant, entry: PIDConfigEntry) -> bool:
-    """Migrate entries created before version 3.0.0.
+    """Migrate old config entries.
 
-    Older releases declared the config flow version as 0.1. The stored data is
-    unchanged since then, so only the version number needs to be raised.
+    1.1: releases before 3.0.0 declared the config flow version as 0.1. The stored
+         data is unchanged since then, so only the version number is raised.
+    1.2: entries created before unique IDs were introduced get the stop ID as
+         unique ID.
     """
-    _LOGGER.debug("Migrating entry %s from version %s", entry.title, entry.version)
+    _LOGGER.debug(
+        "Migrating entry %s from version %s.%s",
+        entry.title,
+        entry.version,
+        entry.minor_version,
+    )
+    if entry.version > 1:
+        # Downgraded from a newer version with an incompatible format.
+        return False
+
     if entry.version < 1:
-        hass.config_entries.async_update_entry(entry, version=1)
-    _LOGGER.debug("Migrated entry %s to version %s", entry.title, entry.version)
+        hass.config_entries.async_update_entry(entry, version=1, minor_version=1)
+
+    if entry.minor_version < 2:
+        _async_set_missing_unique_id(hass, entry)
+        hass.config_entries.async_update_entry(entry, minor_version=2)
+
+    _LOGGER.debug(
+        "Migrated entry %s to version %s.%s",
+        entry.title,
+        entry.version,
+        entry.minor_version,
+    )
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PIDConfigEntry) -> bool:
     """Set up Departure Board from a config entry."""
-    _async_set_missing_unique_id(hass, entry)
-
     coordinator = PIDDepartureUpdateCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
 
